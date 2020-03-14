@@ -10,12 +10,17 @@ upgraded or uninstalled in your Kubernetes cluster.
  1. Create a [Slack Bot](https://my.slack.com/services/new/bot).
     - username: `kubewise`
     - name: `KubeWise`
-    - icon: `./assets/kubewise-mark-512x512.png`
+    - icon: [Use This](https://raw.githubusercontent.com/larderdev/kubwise/master/assets/kubewise-mark-blue-512x512.png)
  2. Save it and grab the API token.
  3. Invite the Bot into your channel by typing `/invite @kubewise` in your Slack channel.
- 4. Install KubeWise in your Kubernetes cluster
+ 4. Install KubeWise in your Kubernetes cluster. See below.
+
+KubeWise hasn't yet made it into a standard Helm Chart Repositories so you will have to
+use the Helm chart which is provided in the code base.
 
 ```
+git clone git@github.com:larderdev/kubwise.git
+cd kubewise
 kubectl create clusterrolebinding cluster-self-admin-binding --clusterrole=cluster-admin --serviceaccount=kubewise:default
 kubectl create namespace kubewise
 helm install kubewise ./helm_chart --namespace kubewise --set slack.token="<api-token>" --set slack.channel="#<channel>"
@@ -31,3 +36,20 @@ helm install kubewise ./helm_chart --namespace kubewise --set slack.token="<api-
 | ![Mattermost mark](./assets/mattermost-mark-50x50.png) | [Mattermost](https://mattermost.com) | ⏳ | [Let me know](https://forms.gle/bWJAaaiYArMJ9hrYA) |
 |  | [Twist](https://twist.com) | ⏳ | [Let me know](https://forms.gle/bWJAaaiYArMJ9hrYA) |
 |  | [Telegram](https://telegram.org) | ⏳ | [Let me know](https://forms.gle/bWJAaaiYArMJ9hrYA) |
+
+# Using KubeWise from outside a cluster
+
+It is easy to use KubeWise from outside your Kubernetes cluster. It will pick up your local
+`kubectl` configuration and use it to speak to your cluster.
+
+You will need to compile the go binary from source. For example,
+
+```
+# Clone and compile the binary
+git clone git@github.com:larderdev/kubwise.git
+cd kubewise
+go build
+
+# Run it against a cluster
+env KW_SLACK_CHANNEL="#<channel>" KW_SLACK_TOKEN="<api-token>" kubewise
+```
