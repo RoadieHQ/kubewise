@@ -1,0 +1,7 @@
+From now on, running helm commands such as:
+{{ if .Values.namespaceToWatch }}
+  helm install [NAME] [CHART] [flags] --namespace {{ .Values.namespaceToWatch }}
+{{ else }}
+  helm install [NAME] [CHART] [flags]
+{{ end }}
+will send a message to the {{ .Values.slack.channel }} Slack channel.
