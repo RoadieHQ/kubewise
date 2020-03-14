@@ -21,7 +21,6 @@ use the Helm chart which is provided in the code base.
 ```
 git clone git@github.com:larderdev/kubwise.git
 cd kubewise
-kubectl create clusterrolebinding cluster-self-admin-binding --clusterrole=cluster-admin --serviceaccount=kubewise:default
 kubectl create namespace kubewise
 helm install kubewise ./helm_chart --namespace kubewise --set slack.token="<api-token>" --set slack.channel="#<channel>"
 ```
