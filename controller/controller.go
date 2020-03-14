@@ -1,3 +1,28 @@
+/*
+Copyright 2016 Skippbox, Ltd.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+/*
+Modifications made
+ 1. Removed code to handle many types of k8s object such as deployments,
+		 pods etc.
+ 2. Remove namespace from Event.
+ 3. Modified #processItem to cast all interfaces to secrets and releases
+    and to handle various types of Helm events.
+*/
+
 package controller
 
 import (
@@ -32,7 +57,6 @@ var serverStartTime time.Time
 type Event struct {
 	key        string
 	eventType  string
-	namespace  string
 	secretType api_v1.SecretType
 }
 
@@ -81,7 +105,6 @@ func newResourceController(client kubernetes.Interface, eventHandler handlers.Ha
 		AddFunc: func(secret interface{}) {
 			newEvent.key, err = cache.MetaNamespaceKeyFunc(secret)
 			newEvent.eventType = "create"
-			newEvent.namespace = secret.(*api_v1.Secret).ObjectMeta.Namespace
 			newEvent.secretType = secret.(*api_v1.Secret).Type
 
 			if err == nil {
@@ -92,7 +115,6 @@ func newResourceController(client kubernetes.Interface, eventHandler handlers.Ha
 		UpdateFunc: func(secret, new interface{}) {
 			newEvent.key, err = cache.MetaNamespaceKeyFunc(secret)
 			newEvent.eventType = "update"
-			newEvent.namespace = secret.(*api_v1.Secret).ObjectMeta.Namespace
 			newEvent.secretType = secret.(*api_v1.Secret).Type
 
 			if err == nil {
@@ -103,7 +125,6 @@ func newResourceController(client kubernetes.Interface, eventHandler handlers.Ha
 		DeleteFunc: func(secret interface{}) {
 			newEvent.key, err = cache.DeletionHandlingMetaNamespaceKeyFunc(secret)
 			newEvent.eventType = "delete"
-			newEvent.namespace = secret.(*api_v1.Secret).ObjectMeta.Namespace
 			newEvent.secretType = secret.(*api_v1.Secret).Type
 
 			if err == nil {
