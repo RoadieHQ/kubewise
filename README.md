@@ -15,15 +15,13 @@ upgraded or uninstalled in your Kubernetes cluster.
  3. Invite the Bot into your channel by typing `/invite @kubewise` in your Slack channel.
  4. Install KubeWise in your Kubernetes cluster. See below.
 
-KubeWise hasn't yet made it into a standard Helm Chart Repositories so you will have to
-use the Helm chart which is provided in the code base.
-
 ```
-git clone git@github.com:larderdev/kubwise.git
-cd kubewise
 kubectl create namespace kubewise
-helm install kubewise ./helm_chart --namespace kubewise --set slack.token="<api-token>" --set slack.channel="#<channel>"
+helm repo add larder https://charts.larder.dev
+helm install kubewise larder/kubewise --namespace kubewise --set slack.token="<api-token>" --set slack.channel="#<channel>"
 ```
+
+That's it! From now on, Helm operations will result in a message in your chosen Slack channel.
 
 # Supported Chat Apps
 
