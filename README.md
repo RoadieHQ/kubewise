@@ -10,7 +10,7 @@ upgraded or uninstalled in your Kubernetes cluster.
  1. Create a [Slack Bot](https://my.slack.com/services/new/bot).
     - username: `kubewise`
     - name: `KubeWise`
-    - icon: [Use This](https://raw.githubusercontent.com/larderdev/kubwise/master/assets/kubewise-mark-blue-512x512.png)
+    - icon: [Use This](https://raw.githubusercontent.com/larderdev/kubewise/master/assets/kubewise-mark-blue-512x512.png)
  2. Save it and grab the API token.
  3. Invite the Bot into your channel by typing `/invite @kubewise` in your Slack channel.
  4. Install KubeWise in your Kubernetes cluster. See below.
@@ -43,7 +43,7 @@ You will need to compile the go binary from source. For example,
 
 ```
 # Clone and compile the binary
-git clone git@github.com:larderdev/kubwise.git
+git clone git@github.com:larderdev/kubewise.git
 cd kubewise
 go build
 
