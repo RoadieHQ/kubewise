@@ -9,7 +9,7 @@ on:
 jobs:
   lint:
     name: Lint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
 
     - name: Check out code into the Go module directory
@@ -20,7 +20,7 @@ jobs:
 
   build:
     name: Build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
 
     - name: Set up Go 1.14
@@ -42,3 +42,59 @@ jobs:
 
     - name: Build
       run: go build -v .
+
+  test:
+    name: Test
+    runs-on: ubuntu-18.04
+    steps:
+
+    - name: Set up Go 1.14
+      uses: actions/setup-go@v1
+      with:
+        go-version: 1.14
+      id: go
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+
+    - name: Get dependencies
+      run: |
+        go get -v -t -d ./...
+        if [ -f Gopkg.toml ]; then
+            curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+            dep ensure
+        fi
+
+    - name: Setup KinD
+      uses: engineerd/setup-kind@v0.3.0
+
+    - name: Output versions
+      run: |
+        kubectl cluster-info
+        kubectl version
+        helm version
+
+    - name: Run Helm operations
+      env:
+        KW_SLACK_TOKEN: ${{ secrets.KW_SLACK_TOKEN }}
+        KW_SLACK_CHANNEL: "#testing-github-actions"
+      run: |
+        go run main.go &> kubewise.log &
+        # Hacky, but I don't know how wait on the backgrounded process.
+        sleep 40s
+        kubectl create namespace zookeeper
+        helm repo add incubator http://storage.googleapis.com/kubernetes-charts-incubator
+        helm repo update
+        helm install zookeeper incubator/zookeeper --namespace zookeeper --version 2.1.3
+        # I've seen a case where zookeeper was uninstalled before the installation success
+        # message was sent to Slack. It could be uninstalling faster than the k8s event is
+        # triggered and can be picked up by KubeWise.
+        sleep 5s
+        helm uninstall zookeeper --namespace zookeeper
+        cat kubewise.log
+
+    - name: Upload KubeWise logs
+      uses: actions/upload-artifact@v1
+      with:
+        name: kubewise
+        path: kubewise.log
