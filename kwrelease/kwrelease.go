@@ -38,12 +38,21 @@ func inferNameOfPreviousReleaseSecret(currentReleaseSecretName string) string {
 	return strings.Join(previousReleaseVersion, ".")
 }
 
+// GetPreviousRelease locates previous Helm releasees based off the name of a given secret.
+// Helm 3 releases have secret names like: sh.helm.release.v1.zookeeper.v1
+// The last `v1` is incremented every time an upgrade occurs. This way, the previous releases
+// of a package can be located by looking for secrets with matching names.
+//
+// When Helm upgrades a package, it leaves secrets from the previous releases in the cluster. They
+// can be located and used to determine if the current operation is an install or an upgrade. It
+// is also useful to inform the user of the appVersion being upgraded from.
 func GetPreviousRelease(releaseSecret *api_v1.Secret) *release.Release {
 	previousReleaseSecretName := inferNameOfPreviousReleaseSecret(releaseSecret.Name)
-	log.Println("Finding previous release with name:", previousReleaseSecretName)
 	if previousReleaseSecretName == "" {
 		return nil
 	}
+
+	log.Println("Finding previous release with name:", previousReleaseSecretName)
 
 	kubeClient := utils.GetClient()
 	getOptions := meta_v1.GetOptions{

@@ -221,7 +221,7 @@ func (c *Controller) processItem(newEvent Event) error {
 
 	secret, ok := object.(*api_v1.Secret)
 
-	if ok != true {
+	if !ok {
 		log.Println("Unable to cast 'object' (interface) as secret in", newEvent.eventType, "event:", object)
 	}
 
