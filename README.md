@@ -1,5 +1,7 @@
 ![KubeWise Mark and Name](./assets/kubewise-name-and-mark-487x127.png)
 
+![Go workflow status](https://github.com/larderdev/kubewise/workflows/Go/badge.svg)
+
 KubeWise is a Slack Bot for Helm. It notifies a Slack channel whenever a Helm chart is installed,
 upgraded or uninstalled in your Kubernetes cluster.
 
