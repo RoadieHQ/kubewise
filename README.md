@@ -44,7 +44,7 @@ You will need to compile the go binary from source. For example,
 ```
 # Clone and compile the binary
 git clone git@github.com:larderdev/kubwise.git
-cd kubewise
+cd kubwise
 go build
 
 # Run it against a cluster
