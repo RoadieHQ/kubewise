@@ -56,6 +56,7 @@ func GetPreviousRelease(releaseSecret *api_v1.Secret) *release.Release {
 
 	if err != nil {
 		log.Println("Error finding previous release secret with name", previousReleaseSecretName)
+		return nil
 	}
 
 	previousRelease, err := driver.DecodeRelease(string(previousReleaseSecret.Data["release"]))
