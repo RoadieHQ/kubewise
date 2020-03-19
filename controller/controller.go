@@ -33,7 +33,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/larderdev/kubewise/config"
 	"github.com/larderdev/kubewise/driver"
 	"github.com/larderdev/kubewise/handlers"
 	"github.com/larderdev/kubewise/kwrelease"
@@ -67,16 +66,21 @@ type Controller struct {
 	eventHandler handlers.Handler
 }
 
-func Start(conf *config.Config, eventHandler handlers.Handler) {
+func Start(eventHandler handlers.Handler) {
 	kubeClient := utils.GetClient()
+	namespace := ""
+	if value, ok := os.LookupEnv("KW_NAMESPACE"); ok {
+		namespace = value
+		log.Println("KubeWise operating in namespace", value, ". Operations in other namespaces will be ignored.")
+	}
 
 	informer := cache.NewSharedIndexInformer(
 		&cache.ListWatch{
 			ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
-				return kubeClient.CoreV1().Secrets(conf.Namespace).List(options)
+				return kubeClient.CoreV1().Secrets(namespace).List(options)
 			},
 			WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
-				return kubeClient.CoreV1().Secrets(conf.Namespace).Watch(options)
+				return kubeClient.CoreV1().Secrets(namespace).Watch(options)
 			},
 		},
 		&api_v1.Secret{},

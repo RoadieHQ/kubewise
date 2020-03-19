@@ -4,41 +4,31 @@ import (
 	"log"
 	"os"
 
-	"github.com/larderdev/kubewise/config"
 	"github.com/larderdev/kubewise/controller"
+	"github.com/larderdev/kubewise/handlers"
+	"github.com/larderdev/kubewise/handlers/googlechat"
 	"github.com/larderdev/kubewise/handlers/slack"
 )
 
 func main() {
-	eventHandler := new(slack.Slack)
-
-	channel := "#general"
-	if value, ok := os.LookupEnv("KW_SLACK_CHANNEL"); ok {
-		channel = value
+	if _, ok := os.LookupEnv("KW_HANDLER"); !ok {
+		log.Fatalln("KW_HANDLER environment variable is required.")
 	}
 
-	var token string
-	if value, ok := os.LookupEnv("KW_SLACK_TOKEN"); ok {
-		token = value
-	} else {
-		log.Fatalln("Missing environment variable KW_SLACK_TOKEN")
+	var eventHandler handlers.Handler
+	switch os.Getenv("KW_HANDLER") {
+	case "googlechat":
+		eventHandler = new(googlechat.GoogleChat)
+	// Slack is the default for backwards compatibility reasons. It was the first handler.
+	default:
+		eventHandler = new(slack.Slack)
 	}
 
-	namespace := ""
-	if value, ok := os.LookupEnv("KW_NAMESPACE"); ok {
-		namespace = value
-	}
-
-	conf := config.Config{
-		Namespace:    namespace,
-		SlackChannel: channel,
-		SlackToken:   token,
-	}
-	err := eventHandler.Init(&conf)
+	err := eventHandler.Init()
 
 	if err != nil {
 		log.Fatalln("Error initializing eventHandler", err)
 	}
 
-	controller.Start(&conf, eventHandler)
+	controller.Start(eventHandler)
 }
