@@ -29,7 +29,10 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: KW_SLACK_TOKEN
-              value: "{{ .Values.slack.token }}"
+              valueFrom:
+                secretKeyRef:
+                  name: kubewise
+                  key: kw_slack_token
             - name: KW_SLACK_CHANNEL
               value: "{{ .Values.slack.channel }}"
             - name: KW_NAMESPACE
