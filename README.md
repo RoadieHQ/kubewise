@@ -29,8 +29,8 @@ That's it! From now on, Helm operations will result in a message in your chosen 
 
 | Logo | Name | Supported | Get notified when support is added |
 | ------------- | ------------- | ------------ | ------- |
-| ![Slack mark](./assets/slack-mark-50x50.svg)  | [Slack](https://slack.com)  | ✅ | |
-| ![Microsoft Teams mark](./assets/ms-teams-mark-50x50.svg) | [Microsoft teams](https://products.office.com/en-us/microsoft-teams/group-chat-software) | ⏳ | [Let me know](https://forms.gle/bWJAaaiYArMJ9hrYA) |
+| ![Slack mark](./assets/slack-mark-50x50.png)  | [Slack](https://slack.com)  | ✅ | |
+| ![Microsoft Teams mark](./assets/ms-teams-mark-50x50.png) | [Microsoft teams](https://products.office.com/en-us/microsoft-teams/group-chat-software) | ⏳ | [Let me know](https://forms.gle/bWJAaaiYArMJ9hrYA) |
 | ![Flock mark](./assets/flock-mark-50x50.jpg) | [Flock](https://flock.com/) | ⏳ | [Let me know](https://forms.gle/bWJAaaiYArMJ9hrYA) |
 | ![Mattermost mark](./assets/mattermost-mark-50x50.png) | [Mattermost](https://mattermost.com) | ⏳ | [Let me know](https://forms.gle/bWJAaaiYArMJ9hrYA) |
 |  | [Twist](https://twist.com) | ⏳ | [Let me know](https://forms.gle/bWJAaaiYArMJ9hrYA) |
