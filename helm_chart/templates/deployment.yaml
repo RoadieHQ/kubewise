@@ -28,6 +28,8 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
+            - name: KW_HANDLER
+              value: "{{ .Values.handler }}"
             - name: KW_SLACK_TOKEN
               valueFrom:
                 secretKeyRef:
@@ -35,5 +37,10 @@ spec:
                   key: kw_slack_token
             - name: KW_SLACK_CHANNEL
               value: "{{ .Values.slack.channel }}"
+            - name: KW_GOOGLECHAT_WEBHOOK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: kubewise
+                  key: kw_googlechat_webhook_url
             - name: KW_NAMESPACE
               value: "{{ .Values.namespaceToWatch }}"

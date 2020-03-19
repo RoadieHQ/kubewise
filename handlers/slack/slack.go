@@ -2,8 +2,8 @@ package slack
 
 import (
 	"log"
+	"os"
 
-	"github.com/larderdev/kubewise/config"
 	"github.com/larderdev/kubewise/presenters"
 	"github.com/slack-go/slack"
 	"helm.sh/helm/v3/pkg/release"
@@ -14,9 +14,21 @@ type Slack struct {
 	Channel string
 }
 
-func (s *Slack) Init(c *config.Config) error {
-	s.Token = c.SlackToken
-	s.Channel = c.SlackChannel
+func (s *Slack) Init() error {
+	channel := "#general"
+	if value, ok := os.LookupEnv("KW_SLACK_CHANNEL"); ok {
+		channel = value
+	}
+
+	var token string
+	if value, ok := os.LookupEnv("KW_SLACK_TOKEN"); ok {
+		token = value
+	} else {
+		log.Fatalln("Missing environment variable KW_SLACK_TOKEN")
+	}
+
+	s.Token = token
+	s.Channel = channel
 	return nil
 }
 

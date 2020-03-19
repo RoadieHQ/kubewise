@@ -6,16 +6,19 @@ replicaCount: 1
 
 image:
   repository: us.gcr.io/larder-prod/kubewise
-  tag: 0.1.1
+  tag: 0.2.0
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
+handler: slack
 slack:
   channel: "#general"
   token:
+googlechat:
+  webhookUrl:
 
 namespaceToWatch: ""
 

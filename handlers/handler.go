@@ -17,33 +17,35 @@ limitations under the License.
 /*
 Modifications made
  1. Pass around release.Release pointers rather than interfaces.
- 2. Removed many handlers
+ 2. Removed many handlers.
+ 3. Added the googlechat handler.
 */
 
 package handlers
 
 import (
-	"github.com/larderdev/kubewise/config"
+	"github.com/larderdev/kubewise/handlers/googlechat"
 	"github.com/larderdev/kubewise/handlers/slack"
 	"helm.sh/helm/v3/pkg/release"
 )
 
 type Handler interface {
-	Init(c *config.Config) error
+	Init() error
 	ObjectCreated(currentRelease, previousRelease *release.Release)
 	ObjectDeleted(currentRelease, previousRelease *release.Release)
 	ObjectUpdated(currentRelease, previousRelease *release.Release)
 }
 
 var Map = map[string]interface{}{
-	"default": &Default{},
-	"slack":   &slack.Slack{},
+	"default":    &Default{},
+	"slack":      &slack.Slack{},
+	"googlechat": &googlechat.GoogleChat{},
 }
 
 type Default struct {
 }
 
-func (d *Default) Init(c *config.Config) error {
+func (d *Default) Init() error {
 	return nil
 }
 
