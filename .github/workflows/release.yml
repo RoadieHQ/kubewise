@@ -12,6 +12,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GOARCH: "386"
         GOOS: linux
+        GO111MODULE: on
 
   release-linux-amd64:
     name: release linux/amd64
@@ -24,6 +25,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GOARCH: amd64
         GOOS: linux
+        GO111MODULE: on
 
   release-darwin-386:
     name: release darwin/386
@@ -36,6 +38,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GOARCH: "386"
         GOOS: darwin
+        GO111MODULE: on
 
   release-darwin-amd64:
     name: release darwin/amd64
@@ -48,6 +51,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GOARCH: amd64
         GOOS: darwin
+        GO111MODULE: on
 
   release-windows-386:
     name: release windows/386
@@ -60,6 +64,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GOARCH: "386"
         GOOS: windows
+        GO111MODULE: on
 
   release-windows-amd64:
     name: release windows/amd64
@@ -72,3 +77,4 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GOARCH: amd64
         GOOS: windows
+        GO111MODULE: on
