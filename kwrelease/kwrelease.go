@@ -13,6 +13,91 @@ import (
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+type Action string
+
+const (
+	ActionPreInstall            Action = "PRE_INSTALL"
+	ActionPreReplaceUpgrade     Action = "PRE_REPLACE-UPGRADE"
+	ActionPreReplaceRollback    Action = "PRE_REPLACE-ROLLBACK"
+	ActionPostInstall           Action = "POST_INSTALL"
+	ActionPostReplace           Action = "POST_REPLACE"
+	ActionPostReplaceSuperseded Action = "POST_REPLACE-SUPERSEDED"
+	ActionPreUninstall          Action = "PRE_UNINSTALL"
+)
+
+type Event struct {
+	// Describes the action that happened to the secret in order to trigger this event. Events
+	// occur when secrets are created, updated or deleted. What was the action that led to this
+	// particular event.
+	SecretAction         string
+	CurrentReleaseSecret *api_v1.Secret
+	currentRelease       *release.Release
+	previousRelease      *release.Release
+}
+
+func (e *Event) Init() error {
+	currentRelease, err := driver.DecodeRelease(string(e.CurrentReleaseSecret.Data["release"]))
+
+	if err != nil {
+		log.Fatalln("Error getting releaseData from secret", e.CurrentReleaseSecret)
+		return err
+	}
+	e.currentRelease = currentRelease
+	e.previousRelease = e.getPreviousRelease()
+
+	return nil
+}
+
+func (e *Event) GetAppName() string {
+	return e.currentRelease.Name
+}
+
+func (e *Event) GetAppVersion() string {
+	return e.currentRelease.Chart.AppVersion()
+}
+
+func (e *Event) GetPreviousAppVersion() string {
+	if e.previousRelease != nil {
+		return e.previousRelease.Chart.AppVersion()
+	}
+	return ""
+}
+
+func (e *Event) GetNamespace() string {
+	return e.currentRelease.Namespace
+}
+
+func (e *Event) GetDescription() string {
+	return e.currentRelease.Info.Description
+}
+
+func (e *Event) GetNotes() string {
+	return e.currentRelease.Info.Notes
+}
+
+func (e *Event) GetAction() Action {
+	if e.currentRelease.Info.Status == release.StatusPendingInstall {
+		return ActionPreInstall
+	} else if e.currentRelease.Info.Status == release.StatusPendingUpgrade {
+		return ActionPreReplaceUpgrade
+	} else if e.currentRelease.Info.Status == release.StatusPendingRollback {
+		return ActionPreReplaceRollback
+	} else if e.currentRelease.Info.Status == release.StatusDeployed {
+		if e.previousRelease == nil {
+			return ActionPostInstall
+		}
+		// There is no way to tell if this is an upgrade or a rollback. The previous release
+		// status will be changed to "superseeded" and the new release will have the status
+		// "deployed". Versions are arbitrary strings so we can't compare them against each
+		// other.
+		// Best I can do is use neutral language like "replaced".
+		return ActionPostReplace
+	} else if e.currentRelease.Info.Status == release.StatusSuperseded {
+		return ActionPostReplaceSuperseded
+	}
+	return ActionPreUninstall
+}
+
 func inferNameOfPreviousReleaseSecret(currentReleaseSecretName string) string {
 	log.Println("Finding previous releases of release name", currentReleaseSecretName)
 	// e.g. [sh helm release v1 airflow v2]
@@ -46,8 +131,8 @@ func inferNameOfPreviousReleaseSecret(currentReleaseSecretName string) string {
 // When Helm upgrades a package, it leaves secrets from the previous releases in the cluster. They
 // can be located and used to determine if the current operation is an install or an upgrade. It
 // is also useful to inform the user of the appVersion being upgraded from.
-func GetPreviousRelease(releaseSecret *api_v1.Secret) *release.Release {
-	previousReleaseSecretName := inferNameOfPreviousReleaseSecret(releaseSecret.Name)
+func (e *Event) getPreviousRelease() *release.Release {
+	previousReleaseSecretName := inferNameOfPreviousReleaseSecret(e.CurrentReleaseSecret.Name)
 	if previousReleaseSecretName == "" {
 		return nil
 	}
@@ -61,7 +146,7 @@ func GetPreviousRelease(releaseSecret *api_v1.Secret) *release.Release {
 			APIVersion: "v1",
 		},
 	}
-	previousReleaseSecret, err := kubeClient.CoreV1().Secrets(releaseSecret.Namespace).Get(previousReleaseSecretName, getOptions)
+	previousReleaseSecret, err := kubeClient.CoreV1().Secrets(e.CurrentReleaseSecret.Namespace).Get(previousReleaseSecretName, getOptions)
 
 	if err != nil {
 		log.Println("Error finding previous release secret with name", previousReleaseSecretName)

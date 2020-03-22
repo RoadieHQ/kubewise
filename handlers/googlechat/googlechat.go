@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/larderdev/kubewise/kwrelease"
 	"github.com/larderdev/kubewise/presenters"
-	"helm.sh/helm/v3/pkg/release"
 )
 
 type GoogleChat struct {
@@ -28,20 +28,8 @@ func (g *GoogleChat) Init() error {
 	return nil
 }
 
-func (g *GoogleChat) ObjectCreated(currentRelease, previousRelease *release.Release) {
-	if msg := presenters.PrepareObjectCreatedMsg(currentRelease, previousRelease); msg != "" {
-		makeRequest(g, msg)
-	}
-}
-
-func (g *GoogleChat) ObjectDeleted(currentRelease, previousRelease *release.Release) {
-	if msg := presenters.PrepareObjectDeletedMsg(currentRelease, previousRelease); msg != "" {
-		makeRequest(g, msg)
-	}
-}
-
-func (g *GoogleChat) ObjectUpdated(currentRelease, previousRelease *release.Release) {
-	if msg := presenters.PrepareObjectUpgradedMsg(currentRelease, previousRelease); msg != "" {
+func (g *GoogleChat) HandleEvent(releaseEvent *kwrelease.Event) {
+	if msg := presenters.PrepareMsg(releaseEvent); msg != "" {
 		makeRequest(g, msg)
 	}
 }

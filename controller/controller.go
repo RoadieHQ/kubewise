@@ -33,7 +33,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/larderdev/kubewise/driver"
 	"github.com/larderdev/kubewise/handlers"
 	"github.com/larderdev/kubewise/kwrelease"
 	"github.com/larderdev/kubewise/utils"
@@ -227,6 +226,7 @@ func (c *Controller) processItem(newEvent Event) error {
 
 	if !ok {
 		log.Println("Unable to cast 'object' (interface) as secret in", newEvent.eventType, "event:", object)
+		return nil
 	}
 
 	if secret.Type != "helm.sh/release.v1" {
@@ -234,28 +234,35 @@ func (c *Controller) processItem(newEvent Event) error {
 		return nil
 	}
 
-	currentRelease, err := driver.DecodeRelease(string(secret.Data["release"]))
+	releaseEvent := &kwrelease.Event{
+		SecretAction:         newEvent.eventType,
+		CurrentReleaseSecret: secret,
+	}
+	err = releaseEvent.Init()
 
 	if err != nil {
-		log.Fatalln("Error getting releaseData from secret", secret)
+		return nil
 	}
 
-	// This can be nil if, for example, this is the first time we are installing this chart.
-	previousRelease := kwrelease.GetPreviousRelease(secret)
+	// This event is the old release secret being marked as superseeded. There is no need to
+	// inform the user of this action. It is internal bookkeeping.
+	if releaseEvent.GetAction() == kwrelease.ActionPostReplaceSuperseded {
+		return nil
+	}
 
-	switch newEvent.eventType {
+	switch releaseEvent.SecretAction {
 	case "create":
 		if secret.ObjectMeta.CreationTimestamp.Sub(serverStartTime).Seconds() > 0 {
-			c.eventHandler.ObjectCreated(currentRelease, previousRelease)
+			c.eventHandler.HandleEvent(releaseEvent)
 			return nil
 		}
 
 	case "update":
-		c.eventHandler.ObjectUpdated(currentRelease, previousRelease)
+		c.eventHandler.HandleEvent(releaseEvent)
 		return nil
 
 	case "delete":
-		c.eventHandler.ObjectDeleted(currentRelease, previousRelease)
+		c.eventHandler.HandleEvent(releaseEvent)
 		return nil
 	}
 

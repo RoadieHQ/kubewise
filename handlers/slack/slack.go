@@ -4,9 +4,9 @@ import (
 	"log"
 	"os"
 
+	"github.com/larderdev/kubewise/kwrelease"
 	"github.com/larderdev/kubewise/presenters"
 	"github.com/slack-go/slack"
-	"helm.sh/helm/v3/pkg/release"
 )
 
 type Slack struct {
@@ -32,20 +32,8 @@ func (s *Slack) Init() error {
 	return nil
 }
 
-func (s *Slack) ObjectCreated(currentRelease, previousRelease *release.Release) {
-	if msg := presenters.PrepareObjectCreatedMsg(currentRelease, previousRelease); msg != "" {
-		sendMessage(s, msg)
-	}
-}
-
-func (s *Slack) ObjectDeleted(currentRelease, previousRelease *release.Release) {
-	if msg := presenters.PrepareObjectDeletedMsg(currentRelease, previousRelease); msg != "" {
-		sendMessage(s, msg)
-	}
-}
-
-func (s *Slack) ObjectUpdated(currentRelease, previousRelease *release.Release) {
-	if msg := presenters.PrepareObjectUpgradedMsg(currentRelease, previousRelease); msg != "" {
+func (s *Slack) HandleEvent(releaseEvent *kwrelease.Event) {
+	if msg := presenters.PrepareMsg(releaseEvent); msg != "" {
 		sendMessage(s, msg)
 	}
 }
