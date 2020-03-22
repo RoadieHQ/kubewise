@@ -26,14 +26,12 @@ package handlers
 import (
 	"github.com/larderdev/kubewise/handlers/googlechat"
 	"github.com/larderdev/kubewise/handlers/slack"
-	"helm.sh/helm/v3/pkg/release"
+	"github.com/larderdev/kubewise/kwrelease"
 )
 
 type Handler interface {
 	Init() error
-	ObjectCreated(currentRelease, previousRelease *release.Release)
-	ObjectDeleted(currentRelease, previousRelease *release.Release)
-	ObjectUpdated(currentRelease, previousRelease *release.Release)
+	HandleEvent(releaseEvent *kwrelease.Event)
 }
 
 var Map = map[string]interface{}{
@@ -49,14 +47,6 @@ func (d *Default) Init() error {
 	return nil
 }
 
-func (d *Default) ObjectCreated(currentRelease, previousRelease *release.Release) {
-
-}
-
-func (d *Default) ObjectDeleted(currentRelease, previousRelease *release.Release) {
-
-}
-
-func (d *Default) ObjectUpdated(currentRelease, previousRelease *release.Release) {
+func (d *Default) HandleEvent(releaseEvent *kwrelease.Event) {
 
 }
