@@ -2,14 +2,21 @@ package presenters
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/larderdev/kubewise/kwrelease"
 )
 
 func PrepareMsg(releaseEvent *kwrelease.Event) string {
+	var msg string
+
+	if value, ok := os.LookupEnv("KW_MESSAGE_PREFIX"); ok {
+		msg += value
+	}
+
 	switch releaseEvent.GetAction() {
 	case kwrelease.ActionPreInstall:
-		return fmt.Sprintf("💽 Installing *%s* version *%s* into namespace *%s* via Helm. ⏳\n\n%s",
+		msg += fmt.Sprintf("📀 Installing *%s* version *%s* into namespace *%s* via Helm. ⏳\n\n%s",
 			releaseEvent.GetAppName(),
 			releaseEvent.GetAppVersion(),
 			releaseEvent.GetNamespace(),
@@ -17,7 +24,7 @@ func PrepareMsg(releaseEvent *kwrelease.Event) string {
 		)
 
 	case kwrelease.ActionPreReplaceUpgrade:
-		return fmt.Sprintf("⏫ Upgrading *%s* from version %s to version *%s* in namespace *%s* via Helm. ⏳",
+		msg += fmt.Sprintf("⏫ Upgrading *%s* from version %s to version *%s* in namespace *%s* via Helm. ⏳",
 			releaseEvent.GetAppName(),
 			releaseEvent.GetPreviousAppVersion(),
 			releaseEvent.GetAppVersion(),
@@ -25,7 +32,7 @@ func PrepareMsg(releaseEvent *kwrelease.Event) string {
 		)
 
 	case kwrelease.ActionPreReplaceRollback:
-		return fmt.Sprintf("⏬ Rolling back *%s* from version %s to version *%s* in namespace *%s* via Helm. ⏳",
+		msg += fmt.Sprintf("⏬ Rolling back *%s* from version %s to version *%s* in namespace *%s* via Helm. ⏳",
 			releaseEvent.GetAppName(),
 			releaseEvent.GetPreviousAppVersion(),
 			releaseEvent.GetAppVersion(),
@@ -33,13 +40,13 @@ func PrepareMsg(releaseEvent *kwrelease.Event) string {
 		)
 
 	case kwrelease.ActionPreUninstall:
-		return fmt.Sprintf("🧼 Uninstalling *%s* from namespace *%s* via Helm. ⏳",
+		msg += fmt.Sprintf("🧼 Uninstalling *%s* from namespace *%s* via Helm. ⏳",
 			releaseEvent.GetAppName(),
 			releaseEvent.GetNamespace(),
 		)
 
 	case kwrelease.ActionPostInstall:
-		return fmt.Sprintf("Installed *%s* version *%s* into namespace *%s* via Helm. ✅\n\n```%s```",
+		msg += fmt.Sprintf("Installed *%s* version *%s* into namespace *%s* via Helm. ✅\n\n```%s```",
 			releaseEvent.GetAppName(),
 			releaseEvent.GetAppVersion(),
 			releaseEvent.GetNamespace(),
@@ -47,15 +54,14 @@ func PrepareMsg(releaseEvent *kwrelease.Event) string {
 		)
 
 	case kwrelease.ActionPostReplace:
-		return fmt.Sprintf("Replaced *%s* version %s with version *%s* in namespace *%s* via Helm. ✅\n\n```%s```",
+		msg += fmt.Sprintf("Replaced *%s* version %s with version *%s* in namespace *%s* via Helm. ✅\n\n```%s```",
 			releaseEvent.GetAppName(),
 			releaseEvent.GetPreviousAppVersion(),
 			releaseEvent.GetAppVersion(),
 			releaseEvent.GetNamespace(),
 			releaseEvent.GetNotes(),
 		)
-
-	default:
-		return ""
 	}
+
+	return msg
 }

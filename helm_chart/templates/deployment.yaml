@@ -44,3 +44,5 @@ spec:
                   key: kw_googlechat_webhook_url
             - name: KW_NAMESPACE
               value: "{{ .Values.namespaceToWatch }}"
+            - name: KW_MESSAGE_PREFIX
+              value: "{{ .Values.messagePrefix }}"
