@@ -19,6 +19,10 @@ slack:
   token:
 googlechat:
   webhookUrl:
+webhook:
+  method: POST
+  url:
+  authToken:
 
 namespaceToWatch: ""
 messagePrefix:

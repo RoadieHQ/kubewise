@@ -7,17 +7,14 @@ upgraded or uninstalled in your Kubernetes cluster.
 
 ![A demo of KubeWise posting Slack messages as ZooKeeper is installed, upgraded and uninstalled](./assets/kubewise-demo.gif)
 
-# Supported Chat Apps
+# Supported Applications
 
 | Logo | Name | Supported |  |
 | ------------- | ------------- | ------------ | ------- |
 | ![Slack mark](./assets/slack-mark-50x50.png)  | [Slack](https://slack.com)  | ✅ | [Get started](#slack) |
 | ![Google Chat mark](./assets/googlechat-mark-50x50.png)  | [Google Hangouts Chat](https://gsuite.google.com/products/chat/)  | ✅ | [Get started](#google-hangouts-chat) |
+|  | Webhooks | ✅ |  |
 | ![Microsoft Teams mark](./assets/ms-teams-mark-50x50.png) | [Microsoft teams](https://products.office.com/en-us/microsoft-teams/group-chat-software) | ⏳ |  |
-| ![Flock mark](./assets/flock-mark-50x50.jpg) | [Flock](https://flock.com/) | ⏳ |  |
-| ![Mattermost mark](./assets/mattermost-mark-50x50.png) | [Mattermost](https://mattermost.com) | ⏳ |  |
-|  | [Twist](https://twist.com) | ⏳ |  |
-|  | [Telegram](https://telegram.org) | ⏳ |  |
 
 📣 [Get notified when your chosen chat app is supported.](https://forms.gle/bWJAaaiYArMJ9hrYA)
 
@@ -76,6 +73,39 @@ helm repo add larder https://charts.larder.dev
 helm install kubewise larder/kubewise --namespace kubewise --set handler=googlechat --set googlechat.webhookUrl="<webhook-url>"
 ```
 
+## Webhooks
+
+KubeWise can be used to send a JSON payload to an arbitrary endpoint when a Helm operation
+occurs.
+
+### How it looks
+
+```json
+{
+  "appName": "zookeeper",
+  "appVersion": "3.5.5",
+  "namespace": "zookeeper",
+  "previousAppVersion": "",
+  "action": "PRE_UNINSTALL",
+  "appDescription": "Deletion in progress (or silently failed)",
+  "installNotes": "... long notes...",
+  "messagePrefix": ""
+}
+```
+
+### Step 1: Install KubeWise
+
+```
+kubectl create namespace kubewise
+helm repo add larder https://charts.larder.dev
+helm install kubewise larder/kubewise --namespace kubewise --set handler=webhook --set webhook.url="<webhook-url>"
+```
+
+The optional parameter `webhook.method` is also supported. It defaults to `POST`.
+
+Basic authentication is supported via the `webhook.authToken="<api-token>"` parameter. It will
+add the following header to the request `"Authorization":"Bearer <api-token>"`.
+
 # Using KubeWise from outside a cluster
 
 It is easy to use KubeWise from outside your Kubernetes cluster. It will pick up your local
@@ -112,12 +142,15 @@ This will produce the following effect:
 
 | Parameter | Environment Variable Equivalent | Default | Description |
 | ------------- | ------------- | ------------ | ------- |
-| `handler` | `KW_HANDLER` | `slack` | The service to send the notifications to. Options are `slack` and `googlechat`. |
+| `handler` | `KW_HANDLER` | `slack` | The service to send the notifications to. Options are `slack`, `webhook` and `googlechat`. |
 | `slack.channel` | `KW_SLACK_CHANNEL` | `#general` | The Slack channel to send notification to when using the Slack handler. |
-| `slack.token` | `KW_SLACK_TOKEN` | `None` | The Slack API token to use. Must be provided by user. |
-| `googlechat.webhookUrl` | `KW_GOOGLECHAT_WEBHOOK_URL` | `None` | The Google Hangouts Chat URL to use. Must be provided by user. |
+| `slack.token` | `KW_SLACK_TOKEN` |  | The Slack API token to use. Must be provided by user. |
+| `webhook.method` | `KW_WEBHOOK_METHOD` | `POST` | The webhook HTTP method to use. |
+| `webhook.url` | `KW_WEBHOOK_URL` |  | The webhook URL to send the request to. |
+| `webhook.authToken` | `KW_WEBHOOK_AUTH_TOKEN` |  | An optional Bearer auth header to send with the request. |
+| `googlechat.webhookUrl` | `KW_GOOGLECHAT_WEBHOOK_URL` |  | The Google Hangouts Chat URL to use. Must be provided by user. |
 | `namespaceToWatch` | `KW_NAMESPACE` | `""` | The cluster namespace to watch for Helm operations in. Leave blank to watch all namespaces. |
-| `messagePrefix` | `KW_MESSAGE_PREFIX` | `None` | A prefix for every notification sent. Often used to identify the cluster (production, staging etc). |
+| `messagePrefix` | `KW_MESSAGE_PREFIX` |  | A prefix for every notification sent. Often used to identify the cluster (production, staging etc). |
 | `image.repository` | | `us.gcr.io/larder-prod/kubewise` | Image repository |
 | `image.tag` | | `<VERSION>` | Image tag |
 | `replicaCount` | | `1` | Number of KubeWise pods to deploy. More than 1 is not desirable |
