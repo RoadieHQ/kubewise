@@ -13,7 +13,7 @@ upgraded or uninstalled in your Kubernetes cluster.
 | ------------- | ------------- | ------------ | ------- |
 | ![Slack mark](./assets/slack-mark-50x50.png)  | [Slack](https://slack.com)  | ✅ | [Get started](#slack) |
 | ![Google Chat mark](./assets/googlechat-mark-50x50.png)  | [Google Hangouts Chat](https://gsuite.google.com/products/chat/)  | ✅ | [Get started](#google-hangouts-chat) |
-|  | Webhooks | ✅ |  |
+|  | Webhooks | ✅ | [Get started](#webhooks) |
 | ![Microsoft Teams mark](./assets/ms-teams-mark-50x50.png) | [Microsoft teams](https://products.office.com/en-us/microsoft-teams/group-chat-software) | ⏳ |  |
 
 📣 [Get notified when your chosen chat app is supported.](https://forms.gle/bWJAaaiYArMJ9hrYA)
@@ -85,11 +85,10 @@ occurs.
   "appName": "zookeeper",
   "appVersion": "3.5.5",
   "namespace": "zookeeper",
-  "previousAppVersion": "",
+  "previousAppVersion": "3.2.1",
   "action": "PRE_UNINSTALL",
-  "appDescription": "Deletion in progress (or silently failed)",
-  "installNotes": "... long notes...",
-  "messagePrefix": ""
+  "appDescription": "Keep your stuff in the zoo",
+  "installNotes": "... truncated notes ..."
 }
 ```
 
