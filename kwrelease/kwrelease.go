@@ -13,18 +13,6 @@ import (
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-type Action string
-
-const (
-	ActionPreInstall            Action = "PRE_INSTALL"
-	ActionPreReplaceUpgrade     Action = "PRE_REPLACE-UPGRADE"
-	ActionPreReplaceRollback    Action = "PRE_REPLACE-ROLLBACK"
-	ActionPostInstall           Action = "POST_INSTALL"
-	ActionPostReplace           Action = "POST_REPLACE"
-	ActionPostReplaceSuperseded Action = "POST_REPLACE-SUPERSEDED"
-	ActionPreUninstall          Action = "PRE_UNINSTALL"
-)
-
 type Event struct {
 	// Describes the action that happened to the secret in order to trigger this event. Events
 	// occur when secrets are created, updated or deleted. What was the action that led to this

@@ -8,6 +8,7 @@ import (
 	"github.com/larderdev/kubewise/handlers"
 	"github.com/larderdev/kubewise/handlers/googlechat"
 	"github.com/larderdev/kubewise/handlers/slack"
+	"github.com/larderdev/kubewise/handlers/webhook"
 )
 
 func main() {
@@ -19,6 +20,8 @@ func main() {
 	switch os.Getenv("KW_HANDLER") {
 	case "googlechat":
 		eventHandler = new(googlechat.GoogleChat)
+	case "webhook":
+		eventHandler = new(webhook.Webhook)
 	// Slack is the default for backwards compatibility reasons. It was the first handler.
 	default:
 		eventHandler = new(slack.Slack)

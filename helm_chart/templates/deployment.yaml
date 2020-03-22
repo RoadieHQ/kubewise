@@ -46,3 +46,7 @@ spec:
               value: "{{ .Values.namespaceToWatch }}"
             - name: KW_MESSAGE_PREFIX
               value: "{{ .Values.messagePrefix }}"
+            - name: KW_WEBHOOK_METHOD
+              value: "{{ .Values.webhook.method }}"
+            - name: KW_WEBHOOK_URL
+              value: "{{ .Values.webhook.url }}"
