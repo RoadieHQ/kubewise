@@ -23,7 +23,7 @@ func PrepareMsg(releaseEvent *kwrelease.Event) string {
 			releaseEvent.GetDescription(),
 		)
 
-	case kwrelease.ActionPreReplaceUpgrade:
+	case kwrelease.ActionPreUpgrade:
 		msg += fmt.Sprintf("⏫ Upgrading *%s* from version %s to version *%s* in namespace *%s* via Helm. ⏳",
 			releaseEvent.GetAppName(),
 			releaseEvent.GetPreviousAppVersion(),
@@ -31,7 +31,7 @@ func PrepareMsg(releaseEvent *kwrelease.Event) string {
 			releaseEvent.GetNamespace(),
 		)
 
-	case kwrelease.ActionPreReplaceRollback:
+	case kwrelease.ActionPreRollback:
 		msg += fmt.Sprintf("⏬ Rolling back *%s* from version %s to version *%s* in namespace *%s* via Helm. ⏳",
 			releaseEvent.GetAppName(),
 			releaseEvent.GetPreviousAppVersion(),
@@ -46,8 +46,26 @@ func PrepareMsg(releaseEvent *kwrelease.Event) string {
 		)
 
 	case kwrelease.ActionPostInstall:
-		msg += fmt.Sprintf("Installed *%s* version *%s* into namespace *%s* via Helm. ✅\n\n```%s```",
+		msg += fmt.Sprintf("📀 Installed *%s* version *%s* into namespace *%s* via Helm. ✅\n\n```%s```",
 			releaseEvent.GetAppName(),
+			releaseEvent.GetAppVersion(),
+			releaseEvent.GetNamespace(),
+			releaseEvent.GetNotes(),
+		)
+
+	case kwrelease.ActionPostUpgrade:
+		msg += fmt.Sprintf("⏫ Upgraded *%s* from version %s to version *%s* in namespace *%s* via Helm. ✅\n\n```%s```",
+			releaseEvent.GetAppName(),
+			releaseEvent.GetPreviousAppVersion(),
+			releaseEvent.GetAppVersion(),
+			releaseEvent.GetNamespace(),
+			releaseEvent.GetNotes(),
+		)
+
+	case kwrelease.ActionPostRollback:
+		msg += fmt.Sprintf("⏬ Rolled back *%s* from version %s to version *%s* in namespace *%s* via Helm. ✅\n\n```%s```",
+			releaseEvent.GetAppName(),
+			releaseEvent.GetPreviousAppVersion(),
 			releaseEvent.GetAppVersion(),
 			releaseEvent.GetNamespace(),
 			releaseEvent.GetNotes(),
