@@ -2,8 +2,8 @@
 
 ![Go workflow status](https://github.com/larderdev/kubewise/workflows/Go/badge.svg)
 
-KubeWise is a notifications bot for Helm. It notifies your team chat whenever a Helm chart is installed,
-upgraded or uninstalled in your Kubernetes cluster.
+KubeWise is a notifications bot for Helm 3. It notifies your team chat whenever a Helm chart is installed,
+upgraded, rolled back or uninstalled in your Kubernetes cluster.
 
 ![A demo of KubeWise posting Slack messages as ZooKeeper is installed, upgraded and uninstalled](./assets/kubewise-demo.gif)
 
