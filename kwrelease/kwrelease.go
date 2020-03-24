@@ -56,7 +56,7 @@ func (e *Event) GetNamespace() string {
 }
 
 func (e *Event) GetDescription() string {
-	return e.currentRelease.Info.Description
+	return e.currentRelease.Chart.Metadata.Description
 }
 
 func (e *Event) GetNotes() string {
