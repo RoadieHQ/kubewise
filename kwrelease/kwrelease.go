@@ -93,18 +93,17 @@ func (e *Event) GetAction() Action {
 	if e.currentRelease.Info.Status == release.StatusPendingInstall {
 		return ActionPreInstall
 	} else if e.currentRelease.Info.Status == release.StatusPendingUpgrade {
-		return ActionPreReplaceUpgrade
+		return ActionPreUpgrade
 	} else if e.currentRelease.Info.Status == release.StatusPendingRollback {
-		return ActionPreReplaceRollback
+		return ActionPreRollback
 	} else if e.currentRelease.Info.Status == release.StatusDeployed {
 		if e.previousRelease == nil {
 			return ActionPostInstall
+		} else if strings.HasPrefix(e.currentRelease.Info.Description, "Rollback") {
+			return ActionPostRollback
+		} else if strings.HasPrefix(e.currentRelease.Info.Description, "Upgrade") {
+			return ActionPostUpgrade
 		}
-		// There is no way to tell if this is an upgrade or a rollback. The previous release
-		// status will be changed to "superseeded" and the new release will have the status
-		// "deployed". Versions are arbitrary strings so we can't compare them against each
-		// other.
-		// Best I can do is use neutral language like "replaced".
 		return ActionPostReplace
 	} else if e.currentRelease.Info.Status == release.StatusSuperseded {
 		return ActionPostReplaceSuperseded
