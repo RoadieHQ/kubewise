@@ -11,6 +11,7 @@ import (
 	"helm.sh/helm/v3/pkg/release"
 	api_v1 "k8s.io/api/core/v1"
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 )
 
 type Event struct {
@@ -61,6 +62,31 @@ func (e *Event) GetDescription() string {
 
 func (e *Event) GetNotes() string {
 	return e.currentRelease.Info.Notes
+}
+
+func (e *Event) GetSecretUID() types.UID {
+	return e.CurrentReleaseSecret.GetUID()
+}
+
+func (e *Event) GetSecretCreationTimestamp() meta_v1.Time {
+	return e.CurrentReleaseSecret.GetCreationTimestamp()
+}
+
+func (e *Event) GetLabelsModifiedAtTimestamp() meta_v1.Time {
+	labels := e.CurrentReleaseSecret.GetObjectMeta().GetLabels()
+
+	// This has happened in regular use.
+	if labels["modifiedAt"] == "" {
+		return meta_v1.Time{}
+	}
+
+	i, err := strconv.ParseInt(labels["modifiedAt"], 10, 64)
+	if err != nil {
+		log.Println("Failed to ParseInt secret.GetObjectMeta().GetLabels()['modifiedAt']:", labels["modifiedAt"])
+		return meta_v1.Time{}
+	}
+
+	return meta_v1.Unix(i, 0)
 }
 
 func (e *Event) GetAction() Action {
