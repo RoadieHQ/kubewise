@@ -89,6 +89,21 @@ func (e *Event) GetLabelsModifiedAtTimestamp() meta_v1.Time {
 	return meta_v1.Unix(i, 0)
 }
 
+func (e *Event) GetChartVersion() string {
+	return e.currentRelease.Chart.Metadata.Version
+}
+
+func (e *Event) GetPreviousChartVersion() string {
+	if e.previousRelease != nil {
+		return e.previousRelease.Chart.Metadata.Version
+	}
+	return ""
+}
+
+func (e *Event) IsAppVersionChanged() bool {
+	return e.GetAppVersion() != e.GetPreviousAppVersion()
+}
+
 func (e *Event) GetAction() Action {
 	if e.currentRelease.Info.Status == release.StatusPendingInstall {
 		return ActionPreInstall
