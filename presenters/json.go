@@ -20,20 +20,20 @@ type EventJSON struct {
 
 func ReleaseEventToJSON(e *kwrelease.Event) ([]byte, error) {
 	event := EventJSON{
-		AppName:            e.GetAppName(),
-		AppVersion:         e.GetAppVersion(),
-		Namespace:          e.GetNamespace(),
-		Action:             e.GetAction().String(),
-		InstallNotes:       e.GetNotes(),
-		AppDescription:     e.GetDescription(),
+		AppName:        e.GetAppName(),
+		AppVersion:     e.GetAppVersion(),
+		Namespace:      e.GetNamespace(),
+		Action:         e.GetAction().String(),
+		InstallNotes:   e.GetNotes(),
+		AppDescription: e.GetDescription(),
 	}
 
-  previousAppVersion := e.GetPreviousAppVersion()
+	previousAppVersion := e.GetPreviousAppVersion()
 
-  // Prevents an empty string value in the JSON.
-  if previousAppVersion != "" {
+	// Prevents an empty string value in the JSON.
+	if previousAppVersion != "" {
 		event.PreviousAppVersion = previousAppVersion
-  }
+	}
 
 	if value, ok := os.LookupEnv("KW_MESSAGE_PREFIX"); ok && value != "" {
 		event.MessagePrefix = value
