@@ -46,12 +46,12 @@ func GetClient() kubernetes.Interface {
 func GetClientInsideCluster() kubernetes.Interface {
 	config, err := rest.InClusterConfig()
 	if err != nil {
-		log.Fatalf("Can not get kubernetes config: %v", err)
+		log.Fatalf("Can not get kubernetes config.")
 	}
 
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		log.Fatalf("Can not create kubernetes client: %v", err)
+		log.Fatalf("Can not create kubernetes client.")
 	}
 
 	return clientset
@@ -68,12 +68,12 @@ func buildOutOfClusterConfig() (*rest.Config, error) {
 func GetClientOutOfCluster() kubernetes.Interface {
 	config, err := buildOutOfClusterConfig()
 	if err != nil {
-		log.Fatalf("Can not get kubernetes config: %v", err)
+		log.Fatalf("Can not get kubernetes config.")
 	}
 
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		log.Fatalf("Can not get kubernetes config: %v", err)
+		log.Fatalf("Can not get kubernetes config.")
 	}
 
 	return clientset
