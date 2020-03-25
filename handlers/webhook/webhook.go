@@ -15,7 +15,7 @@ type Webhook struct {
 	Method string
 }
 
-func (w *Webhook) Init() error {
+func (w *Webhook) Init() {
 	var url string
 
 	method := "POST"
@@ -31,21 +31,25 @@ func (w *Webhook) Init() error {
 
 	w.Method = method
 	w.URL = url
-	return nil
 }
 
 func (w *Webhook) HandleEvent(releaseEvent *kwrelease.Event) {
 	jsonStr, jsonErr := presenters.ReleaseEventToJSON(releaseEvent)
 
 	if jsonErr != nil {
+		// The message should never contain any sensitive data so it's safe to log this err.
 		log.Println("Error encoding JSON in webhook event", jsonErr)
+		return
 	}
 
 	client := &http.Client{}
 	req, reqErr := http.NewRequest(w.Method, w.URL, bytes.NewBuffer(jsonStr))
 
 	if reqErr != nil {
+		// Safe enough to print this err because any authentication header has not yet been attached.
+		// There could be auth tokens in the query string of course. This will need handling later.
 		log.Println("Error forming request in webhook event", reqErr)
+		return
 	}
 
 	req.Header.Add("Content-Type", "application/json")
@@ -57,7 +61,9 @@ func (w *Webhook) HandleEvent(releaseEvent *kwrelease.Event) {
 	resp, respErr := client.Do(req)
 
 	if respErr != nil {
-		log.Println("Error handling response to webhook event", respErr)
+		// Do NOT print this error. Could leak Authorization header.
+		log.Println("Error handling response to webhook event. Response status:", resp.Status)
+		return
 	}
 
 	log.Println("Successful response received from", w.Method, w.URL, ":", resp.StatusCode)

@@ -27,11 +27,6 @@ func main() {
 		eventHandler = new(slack.Slack)
 	}
 
-	err := eventHandler.Init()
-
-	if err != nil {
-		log.Fatalln("Error initializing eventHandler", err)
-	}
-
+	eventHandler.Init()
 	controller.Start(eventHandler)
 }

@@ -3,6 +3,7 @@ package slack
 import (
 	"log"
 	"os"
+	"strings"
 
 	"github.com/larderdev/kubewise/kwrelease"
 	"github.com/larderdev/kubewise/presenters"
@@ -14,7 +15,7 @@ type Slack struct {
 	Channel string
 }
 
-func (s *Slack) Init() error {
+func (s *Slack) Init() {
 	channel := "#general"
 	if value, ok := os.LookupEnv("KW_SLACK_CHANNEL"); ok {
 		channel = value
@@ -29,7 +30,6 @@ func (s *Slack) Init() error {
 
 	s.Token = token
 	s.Channel = channel
-	return nil
 }
 
 func (s *Slack) HandleEvent(releaseEvent *kwrelease.Event) {
@@ -46,7 +46,7 @@ func sendMessage(s *Slack, msg string) {
 	channelID, timestamp, err := api.PostMessage(s.Channel, text, asUser)
 
 	if err != nil {
-		log.Printf("%s\n", err)
+		log.Println(strings.ReplaceAll(err.Error(), s.Token, "<slack-api-token>"))
 		return
 	}
 

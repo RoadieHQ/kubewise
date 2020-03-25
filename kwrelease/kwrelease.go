@@ -28,7 +28,7 @@ func (e *Event) Init() error {
 	currentRelease, err := driver.DecodeRelease(string(e.CurrentReleaseSecret.Data["release"]))
 
 	if err != nil {
-		log.Fatalln("Error getting releaseData from secret", e.CurrentReleaseSecret)
+		log.Fatalln("Error getting releaseData from secret with UID:", e.CurrentReleaseSecret.GetUID())
 		return err
 	}
 	e.currentRelease = currentRelease
@@ -127,7 +127,6 @@ func (e *Event) GetAction() Action {
 }
 
 func inferNameOfPreviousReleaseSecret(currentReleaseSecretName string) string {
-	log.Println("Finding previous releases of release name", currentReleaseSecretName)
 	// e.g. [sh helm release v1 airflow v2]
 	currentReleaseVersion := strings.Split(currentReleaseSecretName, ".")
 	previousReleaseVersion := make([]string, len(currentReleaseVersion))
@@ -184,7 +183,7 @@ func (e *Event) getPreviousRelease() *release.Release {
 	previousRelease, err := driver.DecodeRelease(string(previousReleaseSecret.Data["release"]))
 
 	if err != nil {
-		log.Println("Error decoding previous Helm release", previousReleaseSecret)
+		log.Println("Error decoding previous Helm release with secret UID:", previousReleaseSecret.GetUID())
 		return nil
 	}
 

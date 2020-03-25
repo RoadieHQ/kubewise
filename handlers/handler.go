@@ -30,7 +30,7 @@ import (
 )
 
 type Handler interface {
-	Init() error
+	Init()
 	HandleEvent(releaseEvent *kwrelease.Event)
 }
 
@@ -43,8 +43,7 @@ var Map = map[string]interface{}{
 type Default struct {
 }
 
-func (d *Default) Init() error {
-	return nil
+func (d *Default) Init() {
 }
 
 func (d *Default) HandleEvent(releaseEvent *kwrelease.Event) {
