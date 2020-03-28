@@ -26,6 +26,7 @@ type EventJSON struct {
 	SecretUID            types.UID    `json:"secretUid"`
 	ChartVersion         string       `json:"chartVersion"`
 	PreviousChartVersion string       `json:"previousChartVersion"`
+	ReleaseDescription   string       `json:"releaseDescription"`
 }
 
 func ReleaseEventToJSON(e *kwrelease.Event) ([]byte, error) {
@@ -35,11 +36,12 @@ func ReleaseEventToJSON(e *kwrelease.Event) ([]byte, error) {
 		Namespace:            e.GetNamespace(),
 		Action:               e.GetAction().String(),
 		InstallNotes:         e.GetNotes(),
-		AppDescription:       e.GetDescription(),
+		AppDescription:       e.GetAppDescription(),
 		CreatedAt:            e.GetSecretCreationTimestamp(),
 		SecretUID:            e.GetSecretUID(),
 		ChartVersion:         e.GetChartVersion(),
 		PreviousChartVersion: e.GetPreviousChartVersion(),
+		ReleaseDescription:   e.GetReleaseDescription(),
 	}
 
 	if value := e.GetLabelsModifiedAtTimestamp(); !value.IsZero() {

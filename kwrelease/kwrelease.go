@@ -56,8 +56,12 @@ func (e *Event) GetNamespace() string {
 	return e.currentRelease.Namespace
 }
 
-func (e *Event) GetDescription() string {
+func (e *Event) GetAppDescription() string {
 	return e.currentRelease.Chart.Metadata.Description
+}
+
+func (e *Event) GetReleaseDescription() string {
+	return e.currentRelease.Info.Description
 }
 
 func (e *Event) GetNotes() string {
@@ -120,6 +124,12 @@ func (e *Event) GetAction() Action {
 			return ActionPostUpgrade
 		}
 		return ActionPostReplace
+	} else if e.currentRelease.Info.Status == release.StatusFailed {
+		if e.previousRelease == nil {
+			return ActionFailedInstall
+		}
+		// There is no way to differentiate between an upgrade and a rollback.
+		return ActionFailedReplace
 	} else if e.currentRelease.Info.Status == release.StatusSuperseded {
 		return ActionPostReplaceSuperseded
 	}
@@ -150,7 +160,7 @@ func inferNameOfPreviousReleaseSecret(currentReleaseSecretName string) string {
 	return strings.Join(previousReleaseVersion, ".")
 }
 
-// GetPreviousRelease locates previous Helm releasees based off the name of a given secret.
+// GetPreviousRelease locates previous Helm releases based off the name of a given secret.
 // Helm 3 releases have secret names like: sh.helm.release.v1.zookeeper.v1
 // The last `v1` is incremented every time an upgrade occurs. This way, the previous releases
 // of a package can be located by looking for secrets with matching names.

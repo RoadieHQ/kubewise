@@ -36,7 +36,7 @@ func PrepareMsg(releaseEvent *kwrelease.Event) string {
 			releaseEvent.GetChartVersion(),
 			releaseEvent.GetNamespace(),
 			releaseEvent.GetAppVersion(),
-			releaseEvent.GetDescription(),
+			releaseEvent.GetAppDescription(),
 		)
 
 	case kwrelease.ActionPreUpgrade:
@@ -96,6 +96,24 @@ func PrepareMsg(releaseEvent *kwrelease.Event) string {
 			releaseEvent.GetChartVersion(),
 			releaseEvent.GetNamespace(),
 			releaseEvent.GetNotes(),
+		)
+
+	case kwrelease.ActionFailedInstall:
+		msg += fmt.Sprintf("❌ Installation of *%s* version *%s* in namespace *%s* has FAILED. ❌\n\n```%s```",
+			releaseEvent.GetAppName(),
+			releaseEvent.GetChartVersion(),
+			releaseEvent.GetNamespace(),
+			// This has the cause of the failure.
+			releaseEvent.GetReleaseDescription(),
+		)
+
+	case kwrelease.ActionFailedReplace:
+		msg += fmt.Sprintf("❌ Replacing *%s* version %s with version *%s* in namespace *%s* has FAILED. ❌\n\n```%s```",
+			releaseEvent.GetAppName(),
+			releaseEvent.GetPreviousChartVersion(),
+			releaseEvent.GetChartVersion(),
+			releaseEvent.GetNamespace(),
+			releaseEvent.GetReleaseDescription(),
 		)
 	}
 
