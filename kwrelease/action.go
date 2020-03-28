@@ -14,6 +14,8 @@ const (
 	ActionPostReplace           Action = "POST_REPLACE"
 	ActionPostReplaceSuperseded Action = "POST_REPLACE-SUPERSEDED"
 	ActionPreUninstall          Action = "PRE_UNINSTALL"
+	ActionFailedInstall         Action = "FAILED_INSTALL"
+	ActionFailedReplace         Action = "FAILED_REPLACE"
 )
 
 func (a Action) String() string {
