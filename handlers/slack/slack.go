@@ -8,6 +8,7 @@ import (
 	"github.com/larderdev/kubewise/kwrelease"
 	"github.com/larderdev/kubewise/presenters"
 	"github.com/slack-go/slack"
+	"helm.sh/helm/v3/pkg/release"
 )
 
 type Slack struct {
@@ -34,6 +35,12 @@ func (s *Slack) Init() {
 
 func (s *Slack) HandleEvent(releaseEvent *kwrelease.Event) {
 	if msg := presenters.PrepareMsg(releaseEvent); msg != "" {
+		sendMessage(s, msg)
+	}
+}
+
+func (s *Slack) HandleServerStartup(releases []*release.Release) {
+	if msg := presenters.PrepareServerStartupMsg(releases); msg != "" {
 		sendMessage(s, msg)
 	}
 }

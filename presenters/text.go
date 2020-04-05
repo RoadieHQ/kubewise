@@ -3,8 +3,12 @@ package presenters
 import (
 	"fmt"
 	"os"
+	"strconv"
+	"strings"
 
 	"github.com/larderdev/kubewise/kwrelease"
+	"github.com/olekukonko/tablewriter"
+	"helm.sh/helm/v3/pkg/release"
 )
 
 func getChangeInAppVersion(releaseEvent *kwrelease.Event) string {
@@ -23,11 +27,7 @@ func getChangeInAppVersion(releaseEvent *kwrelease.Event) string {
 }
 
 func PrepareMsg(releaseEvent *kwrelease.Event) string {
-	var msg string
-
-	if value, ok := os.LookupEnv("KW_MESSAGE_PREFIX"); ok {
-		msg += value
-	}
+	msg := initializeServerStartupMsg()
 
 	switch releaseEvent.GetAction() {
 	case kwrelease.ActionPreInstall:
@@ -118,4 +118,54 @@ func PrepareMsg(releaseEvent *kwrelease.Event) string {
 	}
 
 	return msg
+}
+
+func initializeServerStartupMsg() string {
+	var msg string
+
+	if value, ok := os.LookupEnv("KW_MESSAGE_PREFIX"); ok {
+		msg += value
+	}
+
+	return msg
+}
+
+func PrepareServerStartupMsg(releases []*release.Release) string {
+	msg := initializeServerStartupMsg()
+	numberOfReleases := len(releases)
+	msg += "👋 KubeWise initialized."
+
+	if numberOfReleases == 1 {
+		msg += " There is *1* Helm chart installed."
+	} else {
+		msg += fmt.Sprintf(" There are *%s* Helm charts installed.",
+			strconv.Itoa(numberOfReleases),
+		)
+	}
+
+	if numberOfReleases > 0 {
+		msg += fmt.Sprintf("```%s```", renderTableShowingInstalledCharts(releases))
+	}
+
+	return msg
+}
+
+func renderTableShowingInstalledCharts(releases []*release.Release) string {
+	data := make([][]string, len(releases))
+	for i, release := range releases {
+		data[i] = []string{
+			release.Name,
+			release.Chart.AppVersion(),
+			release.Chart.Metadata.Version,
+		}
+	}
+
+	tableString := &strings.Builder{}
+	table := tablewriter.NewWriter(tableString)
+	table.SetHeader([]string{"App Name", "App Version", "Chart Version"})
+	table.SetBorder(false)
+	table.AppendBulk(data)
+	table.Render()
+
+	return tableString.String()
 }

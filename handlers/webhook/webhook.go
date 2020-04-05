@@ -2,12 +2,14 @@ package webhook
 
 import (
 	"bytes"
+	"encoding/json"
 	"log"
 	"net/http"
 	"os"
 
 	"github.com/larderdev/kubewise/kwrelease"
 	"github.com/larderdev/kubewise/presenters"
+	rspb "helm.sh/helm/v3/pkg/release"
 )
 
 type Webhook struct {
@@ -34,14 +36,32 @@ func (w *Webhook) Init() {
 }
 
 func (w *Webhook) HandleEvent(releaseEvent *kwrelease.Event) {
-	jsonStr, jsonErr := presenters.ReleaseEventToJSON(releaseEvent)
+	releaseEventForJSON := presenters.ToReleaseEventForJSON(releaseEvent)
+	jsonStr, err := json.Marshal(releaseEventForJSON)
 
-	if jsonErr != nil {
+	if err != nil {
 		// The message should never contain any sensitive data so it's safe to log this err.
-		log.Println("Error encoding JSON in webhook event", jsonErr)
+		log.Println("Error encoding JSON in webhook event", err)
 		return
 	}
 
+	makeRequest(w, jsonStr)
+}
+
+func (w *Webhook) HandleServerStartup(releases []*rspb.Release) {
+	existingReleases := presenters.ToExistingReleasesForJSON(releases)
+	jsonStr, err := json.Marshal(existingReleases)
+
+	if err != nil {
+		// The message should never contain any sensitive data so it's safe to log this err.
+		log.Println("Error encoding JSON in webhook event", err)
+		return
+	}
+
+	makeRequest(w, jsonStr)
+}
+
+func makeRequest(w *Webhook, jsonStr []byte) {
 	client := &http.Client{}
 	req, reqErr := http.NewRequest(w.Method, w.URL, bytes.NewBuffer(jsonStr))
 
