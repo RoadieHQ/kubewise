@@ -10,6 +10,7 @@ import (
 
 	"github.com/larderdev/kubewise/kwrelease"
 	"github.com/larderdev/kubewise/presenters"
+	"helm.sh/helm/v3/pkg/release"
 )
 
 type GoogleChat struct {
@@ -29,6 +30,12 @@ func (g *GoogleChat) Init() {
 
 func (g *GoogleChat) HandleEvent(releaseEvent *kwrelease.Event) {
 	if msg := presenters.PrepareMsg(releaseEvent); msg != "" {
+		makeRequest(g, msg)
+	}
+}
+
+func (g *GoogleChat) HandleServerStartup(releases []*release.Release) {
+	if msg := presenters.PrepareServerStartupMsg(releases); msg != "" {
 		makeRequest(g, msg)
 	}
 }

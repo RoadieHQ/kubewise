@@ -9,6 +9,7 @@ import (
 	"github.com/larderdev/kubewise/handlers/googlechat"
 	"github.com/larderdev/kubewise/handlers/slack"
 	"github.com/larderdev/kubewise/handlers/webhook"
+	"github.com/larderdev/kubewise/kwrelease"
 )
 
 func main() {
@@ -28,5 +29,7 @@ func main() {
 	}
 
 	eventHandler.Init()
+	eventHandler.HandleServerStartup(kwrelease.ListActiveReleases())
+	// This is a blocking call. Code placed after this won't run until teardown.
 	controller.Start(eventHandler)
 }

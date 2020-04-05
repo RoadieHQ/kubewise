@@ -27,11 +27,13 @@ import (
 	"github.com/larderdev/kubewise/handlers/googlechat"
 	"github.com/larderdev/kubewise/handlers/slack"
 	"github.com/larderdev/kubewise/kwrelease"
+	"helm.sh/helm/v3/pkg/release"
 )
 
 type Handler interface {
 	Init()
 	HandleEvent(releaseEvent *kwrelease.Event)
+	HandleServerStartup(releases []*release.Release)
 }
 
 var Map = map[string]interface{}{
@@ -47,5 +49,9 @@ func (d *Default) Init() {
 }
 
 func (d *Default) HandleEvent(releaseEvent *kwrelease.Event) {
+
+}
+
+func (d *Default) HandleServerStartup(releases []*release.Release) {
 
 }

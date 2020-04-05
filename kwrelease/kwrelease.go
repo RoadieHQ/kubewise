@@ -3,138 +3,14 @@ package kwrelease
 import (
 	"fmt"
 	"log"
+	"os"
 	"strconv"
 	"strings"
 
-	"github.com/larderdev/kubewise/driver"
 	"github.com/larderdev/kubewise/utils"
-	"helm.sh/helm/v3/pkg/release"
-	api_v1 "k8s.io/api/core/v1"
-	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
+	rspb "helm.sh/helm/v3/pkg/release"
+	helmdriver "helm.sh/helm/v3/pkg/storage/driver"
 )
-
-type Event struct {
-	// Describes the action that happened to the secret in order to trigger this event. Events
-	// occur when secrets are created, updated or deleted. What was the action that led to this
-	// particular event.
-	SecretAction         string
-	CurrentReleaseSecret *api_v1.Secret
-	currentRelease       *release.Release
-	previousRelease      *release.Release
-}
-
-func (e *Event) Init() error {
-	currentRelease, err := driver.DecodeRelease(string(e.CurrentReleaseSecret.Data["release"]))
-
-	if err != nil {
-		log.Fatalln("Error getting releaseData from secret with UID:", e.CurrentReleaseSecret.GetUID())
-		return err
-	}
-	e.currentRelease = currentRelease
-	e.previousRelease = e.getPreviousRelease()
-
-	return nil
-}
-
-func (e *Event) GetAppName() string {
-	return e.currentRelease.Name
-}
-
-func (e *Event) GetAppVersion() string {
-	return e.currentRelease.Chart.AppVersion()
-}
-
-func (e *Event) GetPreviousAppVersion() string {
-	if e.previousRelease != nil {
-		return e.previousRelease.Chart.AppVersion()
-	}
-	return ""
-}
-
-func (e *Event) GetNamespace() string {
-	return e.currentRelease.Namespace
-}
-
-func (e *Event) GetAppDescription() string {
-	return e.currentRelease.Chart.Metadata.Description
-}
-
-func (e *Event) GetReleaseDescription() string {
-	return e.currentRelease.Info.Description
-}
-
-func (e *Event) GetNotes() string {
-	return e.currentRelease.Info.Notes
-}
-
-func (e *Event) GetSecretUID() types.UID {
-	return e.CurrentReleaseSecret.GetUID()
-}
-
-func (e *Event) GetSecretCreationTimestamp() meta_v1.Time {
-	return e.CurrentReleaseSecret.GetCreationTimestamp()
-}
-
-func (e *Event) GetLabelsModifiedAtTimestamp() meta_v1.Time {
-	labels := e.CurrentReleaseSecret.GetObjectMeta().GetLabels()
-
-	// This has happened in regular use.
-	if labels["modifiedAt"] == "" {
-		return meta_v1.Time{}
-	}
-
-	i, err := strconv.ParseInt(labels["modifiedAt"], 10, 64)
-	if err != nil {
-		log.Println("Failed to ParseInt secret.GetObjectMeta().GetLabels()['modifiedAt']:", labels["modifiedAt"])
-		return meta_v1.Time{}
-	}
-
-	return meta_v1.Unix(i, 0)
-}
-
-func (e *Event) GetChartVersion() string {
-	return e.currentRelease.Chart.Metadata.Version
-}
-
-func (e *Event) GetPreviousChartVersion() string {
-	if e.previousRelease != nil {
-		return e.previousRelease.Chart.Metadata.Version
-	}
-	return ""
-}
-
-func (e *Event) IsAppVersionChanged() bool {
-	return e.GetAppVersion() != e.GetPreviousAppVersion()
-}
-
-func (e *Event) GetAction() Action {
-	if e.currentRelease.Info.Status == release.StatusPendingInstall {
-		return ActionPreInstall
-	} else if e.currentRelease.Info.Status == release.StatusPendingUpgrade {
-		return ActionPreUpgrade
-	} else if e.currentRelease.Info.Status == release.StatusPendingRollback {
-		return ActionPreRollback
-	} else if e.currentRelease.Info.Status == release.StatusDeployed {
-		if e.previousRelease == nil {
-			return ActionPostInstall
-		} else if strings.HasPrefix(e.currentRelease.Info.Description, "Rollback") {
-			return ActionPostRollback
-		} else if strings.HasPrefix(e.currentRelease.Info.Description, "Upgrade") {
-			return ActionPostUpgrade
-		}
-		return ActionPostReplace
-	} else if e.currentRelease.Info.Status == release.StatusFailed {
-		if e.previousRelease == nil {
-			return ActionFailedInstall
-		}
-		// There is no way to differentiate between an upgrade and a rollback.
-		return ActionFailedReplace
-	} else if e.currentRelease.Info.Status == release.StatusSuperseded {
-		return ActionPostReplaceSuperseded
-	}
-	return ActionPreUninstall
-}
 
 func inferNameOfPreviousReleaseSecret(currentReleaseSecretName string) string {
 	// e.g. [sh helm release v1 airflow v2]
@@ -160,6 +36,19 @@ func inferNameOfPreviousReleaseSecret(currentReleaseSecretName string) string {
 	return strings.Join(previousReleaseVersion, ".")
 }
 
+func (e *Event) GetRelease(secretName string) *rspb.Release {
+	kubeClient := utils.GetClient()
+	secrets := helmdriver.NewSecrets(kubeClient.CoreV1().Secrets(e.CurrentReleaseSecret.Namespace))
+	result, err := secrets.Get(secretName)
+
+	if err != nil {
+		log.Println("Error finding release secret with name:", secretName)
+		return nil
+	}
+
+	return result
+}
+
 // GetPreviousRelease locates previous Helm releases based off the name of a given secret.
 // Helm 3 releases have secret names like: sh.helm.release.v1.zookeeper.v1
 // The last `v1` is incremented every time an upgrade occurs. This way, the previous releases
@@ -168,34 +57,33 @@ func inferNameOfPreviousReleaseSecret(currentReleaseSecretName string) string {
 // When Helm upgrades a package, it leaves secrets from the previous releases in the cluster. They
 // can be located and used to determine if the current operation is an install or an upgrade. It
 // is also useful to inform the user of the appVersion being upgraded from.
-func (e *Event) getPreviousRelease() *release.Release {
+func (e *Event) getPreviousRelease() *rspb.Release {
 	previousReleaseSecretName := inferNameOfPreviousReleaseSecret(e.CurrentReleaseSecret.Name)
 	if previousReleaseSecretName == "" {
 		return nil
 	}
 
 	log.Println("Finding previous release with name:", previousReleaseSecretName)
+	return e.GetRelease(previousReleaseSecretName)
+}
 
+func ListActiveReleases() []*rspb.Release {
 	kubeClient := utils.GetClient()
-	getOptions := meta_v1.GetOptions{
-		TypeMeta: meta_v1.TypeMeta{
-			Kind:       "Secret",
-			APIVersion: "v1",
-		},
+
+	namespace := ""
+	if value, ok := os.LookupEnv("KW_NAMESPACE"); ok {
+		namespace = value
 	}
-	previousReleaseSecret, err := kubeClient.CoreV1().Secrets(e.CurrentReleaseSecret.Namespace).Get(previousReleaseSecretName, getOptions)
+
+	secrets := helmdriver.NewSecrets(kubeClient.CoreV1().Secrets(namespace))
+	results, err := secrets.List(func(r *rspb.Release) bool {
+		return r.Info.Status != rspb.StatusSuperseded
+	})
 
 	if err != nil {
-		log.Println("Error finding previous release secret with name", previousReleaseSecretName)
+		log.Println("Error finding release secrets")
 		return nil
 	}
 
-	previousRelease, err := driver.DecodeRelease(string(previousReleaseSecret.Data["release"]))
-
-	if err != nil {
-		log.Println("Error decoding previous Helm release with secret UID:", previousReleaseSecret.GetUID())
-		return nil
-	}
-
-	return previousRelease
+	return results
 }

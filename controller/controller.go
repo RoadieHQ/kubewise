@@ -252,10 +252,17 @@ func (c *Controller) processItem(newEvent Event) error {
 
 	switch releaseEvent.SecretAction {
 	case "create":
+		// "create" events are triggered for all the Helm secrets which are already in the cluster
+		// when KubeWise starts up. Handling them normally would result in individual handler events
+		// being triggered for each Helm chart which is already in the cluster. This could be a lot
+		// of Slack messages being sent.
+		//
+		// Checking if the server started up less than zero seconds ago is a hacky way to prevent
+		// this handler spam.
 		if secret.ObjectMeta.CreationTimestamp.Sub(serverStartTime).Seconds() > 0 {
 			c.eventHandler.HandleEvent(releaseEvent)
-			return nil
 		}
+		return nil
 
 	case "update":
 		c.eventHandler.HandleEvent(releaseEvent)
