@@ -52,3 +52,5 @@ spec:
               value: "{{ .Values.webhook.method }}"
             - name: KW_WEBHOOK_URL
               value: "{{ .Values.webhook.url }}"
+            - name: KW_CHART_VALUES_DIFF_ENABLED
+              value: "{{ .Values.chartValuesDiff.enabled }}"

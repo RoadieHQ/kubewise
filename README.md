@@ -154,6 +154,7 @@ This will produce the following effect:
 | `googlechat.webhookUrl` | `KW_GOOGLECHAT_WEBHOOK_URL` |  | The Google Hangouts Chat URL to use. Must be provided by user. |
 | `namespaceToWatch` | `KW_NAMESPACE` | `""` | The cluster namespace to watch for Helm operations in. Leave blank to watch all namespaces. |
 | `messagePrefix` | `KW_MESSAGE_PREFIX` |  | A prefix for every notification sent. Often used to identify the cluster (production, staging etc). |
+| `chartValuesDiff.enabled` | `KW_CHART_VALUES_DIFF_ENABLED` | `false` | When `true`, KubeWise will log a diff of the chart values when a package is upgraded or rolled back. This is useful for visualizing changes between package versions. Be extremely careful with this feature as it can leak sensitive chart values. |
 | `image.repository` | | `us.gcr.io/larder-prod/kubewise` | Image repository |
 | `image.tag` | | `<VERSION>` | Image tag |
 | `replicaCount` | | `1` | Number of KubeWise pods to deploy. More than 1 is not desirable |

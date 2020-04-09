@@ -26,6 +26,6 @@ sources:
 maintainers:
   - name: davidtuite
     email: david@larder.dev
-    url: https://www.davidtuite.com
+    url: https://www.larder.dev/kubewise
 
 icon: https://github.com/larderdev/kubewise/blob/master/assets/kubewise-mark-blue-512x512.png
