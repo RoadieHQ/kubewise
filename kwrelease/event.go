@@ -1,10 +1,13 @@
 package kwrelease
 
 import (
+	"fmt"
 	"log"
 	"strconv"
 	"strings"
 
+	"github.com/pmezard/go-difflib/difflib"
+	"helm.sh/helm/v3/pkg/chartutil"
 	rspb "helm.sh/helm/v3/pkg/release"
 	api_v1 "k8s.io/api/core/v1"
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -37,6 +40,8 @@ func (e *Event) Init() error {
 	// By Getting the release from the store we get it back decoded for us.
 	e.currentRelease = e.GetRelease(e.CurrentReleaseSecret.Name)
 	e.previousRelease = e.getPreviousRelease()
+
+	e.GetConfigDiffYAML()
 
 	return nil
 }
@@ -135,6 +140,48 @@ func (e *Event) GetPreviousChartVersion() string {
 // one Helm Chart version to another.
 func (e *Event) IsAppVersionChanged() bool {
 	return e.GetAppVersion() != e.GetPreviousAppVersion()
+}
+
+// GetConfigDiffYAML is useful to show what has changed during a chart upgrade or rollback. It
+// will show a diff of the values file in the Slack message or other notification. Be careful
+// with secrets.
+func (e *Event) GetConfigDiffYAML() string {
+	currentReleaseConfigYAML, err := chartutil.Values(e.currentRelease.Config).YAML()
+
+	if err != nil {
+		// Do NOT log the values. Could leak sensitive data.
+		log.Println("Error rendering current release config to YAML for application:", e.GetAppName())
+		return ""
+	}
+
+	if e.previousRelease == nil {
+		return fmt.Sprintf("%s\n", currentReleaseConfigYAML)
+	}
+
+	previousReleaseConfigYAML, err := chartutil.Values(e.previousRelease.Config).YAML()
+
+	if err != nil {
+		// Do NOT log the values. Could leak sensitive data.
+		log.Println("Error rendering previous release config to YAML for application:", e.GetAppName())
+		return ""
+	}
+
+	diff := difflib.UnifiedDiff{
+		A:        difflib.SplitLines(previousReleaseConfigYAML),
+		B:        difflib.SplitLines(currentReleaseConfigYAML),
+		FromFile: "Old Values",
+		ToFile:   "New Values",
+		Context:  3,
+	}
+
+	diffText, err := difflib.GetUnifiedDiffString(diff)
+
+	if err != nil {
+		log.Println("Error diffing chart for application:", e.GetAppName())
+		return ""
+	}
+
+	return diffText
 }
 
 // GetAction returns the action which is being performed in this Event. It may be an install,

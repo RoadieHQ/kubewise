@@ -2,6 +2,7 @@ package presenters
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -24,6 +25,21 @@ func getChangeInAppVersion(releaseEvent *kwrelease.Event) string {
 		)
 	}
 	return appVersion
+}
+
+func getConfigDiff(releaseEvent *kwrelease.Event) string {
+	showDiff, err := strconv.ParseBool(os.Getenv("KW_CHART_VALUES_DIFF_ENABLED"))
+
+	if err != nil {
+		log.Println("Invalid value passed for environment variable KW_CHART_VALUES_DIFF_ENABLED. Boolean required.")
+	}
+
+	configDiffYAML := releaseEvent.GetConfigDiffYAML()
+	if showDiff && configDiffYAML != "" {
+		return fmt.Sprintf("\n```%s```", configDiffYAML)
+	}
+
+	return ""
 }
 
 // PrepareMsg prepares a short, markdown-like message which is suitable for sending to chat
@@ -51,6 +67,10 @@ func PrepareMsg(releaseEvent *kwrelease.Event) string {
 			getChangeInAppVersion(releaseEvent),
 		)
 
+		if configDiff := getConfigDiff(releaseEvent); configDiff != "" {
+			msg += configDiff
+		}
+
 	case kwrelease.ActionPreRollback:
 		msg += fmt.Sprintf("⏬ Rolling back *%s* from version %s to version *%s* in namespace *%s* via Helm. ⏳\n%s",
 			releaseEvent.GetAppName(),
@@ -59,6 +79,10 @@ func PrepareMsg(releaseEvent *kwrelease.Event) string {
 			releaseEvent.GetNamespace(),
 			getChangeInAppVersion(releaseEvent),
 		)
+
+		if configDiff := getConfigDiff(releaseEvent); configDiff != "" {
+			msg += configDiff
+		}
 
 	case kwrelease.ActionPreUninstall:
 		msg += fmt.Sprintf("🧼 Uninstalling *%s* from namespace *%s* via Helm. ⏳",
@@ -75,30 +99,27 @@ func PrepareMsg(releaseEvent *kwrelease.Event) string {
 		)
 
 	case kwrelease.ActionPostUpgrade:
-		msg += fmt.Sprintf("⏫ Upgraded *%s* from version %s to version *%s* in namespace *%s* via Helm. ✅\n\n```%s```",
+		msg += fmt.Sprintf("⏫ Upgraded *%s* from version %s to version *%s* in namespace *%s* via Helm. ✅",
 			releaseEvent.GetAppName(),
 			releaseEvent.GetPreviousChartVersion(),
 			releaseEvent.GetChartVersion(),
 			releaseEvent.GetNamespace(),
-			releaseEvent.GetNotes(),
 		)
 
 	case kwrelease.ActionPostRollback:
-		msg += fmt.Sprintf("⏬ Rolled back *%s* from version %s to version *%s* in namespace *%s* via Helm. ✅\n\n```%s```",
+		msg += fmt.Sprintf("⏬ Rolled back *%s* from version %s to version *%s* in namespace *%s* via Helm. ✅",
 			releaseEvent.GetAppName(),
 			releaseEvent.GetPreviousChartVersion(),
 			releaseEvent.GetChartVersion(),
 			releaseEvent.GetNamespace(),
-			releaseEvent.GetNotes(),
 		)
 
 	case kwrelease.ActionPostReplace:
-		msg += fmt.Sprintf("Replaced *%s* version %s with version *%s* in namespace *%s* via Helm. ✅\n\n```%s```",
+		msg += fmt.Sprintf("Replaced *%s* version %s with version *%s* in namespace *%s* via Helm. ✅",
 			releaseEvent.GetAppName(),
 			releaseEvent.GetPreviousChartVersion(),
 			releaseEvent.GetChartVersion(),
 			releaseEvent.GetNamespace(),
-			releaseEvent.GetNotes(),
 		)
 
 	case kwrelease.ActionFailedInstall:

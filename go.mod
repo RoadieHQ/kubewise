@@ -3,17 +3,19 @@ module github.com/larderdev/kubewise
 go 1.14
 
 require (
-	github.com/Azure/go-autorest v14.0.0+incompatible
-	github.com/jmoiron/sqlx v1.2.0 // indirect
-	github.com/lib/pq v1.3.0 // indirect
+  github.com/Azure/go-autorest v14.0.0+incompatible
+	github.com/golang/groupcache v0.0.0-20190702054246-869f871628b6 // indirect
 	github.com/olekukonko/tablewriter v0.0.2
-	github.com/rubenv/sql-migrate v0.0.0-20200402132117-435005d389bc // indirect
+	github.com/pmezard/go-difflib v1.0.0
 	github.com/slack-go/slack v0.6.3
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
 	golang.org/x/tools v0.0.0-20200410194907-79a7a3126eef // indirect
+	golang.org/x/net v0.0.0-20200226121028-0de0cce0169b // indirect
+	golang.org/x/sys v0.0.0-20191220142924-d4481acd189f // indirect
+	golang.org/x/time v0.0.0-20191024005414-555d28b269f0 // indirect
+	google.golang.org/appengine v1.6.5 // indirect
 	helm.sh/helm/v3 v3.1.1
 	k8s.io/api v0.17.3
 	k8s.io/apimachinery v0.17.3
 	k8s.io/client-go v0.17.2
-	k8s.io/helm v2.16.5+incompatible
 )
