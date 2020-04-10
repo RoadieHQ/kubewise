@@ -1,7 +1,12 @@
 package kwrelease
 
+// Action describes the action that was taken by Helm. For example, it could be an install
+// or an uninstall (delete) action. There are typically two phases to each action, pre and
+// post. This can best be demonstrated by using helm ... --wait. Helm will create a release
+// to mark the start of the action (pre) and update it to mark the end of the action (post).
 type Action string
 
+// All possible actions and their states. See helm/pkg/release/status.go for more details.
 const (
 	ActionPreInstall   Action = "PRE_INSTALL"
 	ActionPreRollback  Action = "PRE_ROLLBACK"
