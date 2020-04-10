@@ -4,3 +4,4 @@
 kubewise
 *.tgz
 dist
+.vscode

@@ -36,6 +36,8 @@ func inferNameOfPreviousReleaseSecret(currentReleaseSecretName string) string {
 	return strings.Join(previousReleaseVersion, ".")
 }
 
+// GetRelease retrieves a release object from the Kubernetes Secret store. It delegates to
+// the Helm Driver for this operation in order to reduce the possibility of breaking changes.
 func (e *Event) GetRelease(secretName string) *rspb.Release {
 	kubeClient := utils.GetClient()
 	secrets := helmdriver.NewSecrets(kubeClient.CoreV1().Secrets(e.CurrentReleaseSecret.Namespace))
@@ -67,6 +69,8 @@ func (e *Event) getPreviousRelease() *rspb.Release {
 	return e.GetRelease(previousReleaseSecretName)
 }
 
+// ListActiveReleases lists releases which have not been superseded by an upgrade, rollback or
+// other operation.
 func ListActiveReleases() []*rspb.Release {
 	kubeClient := utils.GetClient()
 
