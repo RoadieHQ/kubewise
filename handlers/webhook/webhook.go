@@ -12,11 +12,14 @@ import (
 	rspb "helm.sh/helm/v3/pkg/release"
 )
 
+// Webhook is capable of sending JSON objects to a HTTP(s) endpoint using any HTTP verb.
 type Webhook struct {
 	URL    string
 	Method string
 }
 
+// Init takes various configuration properties from environment variables and stores them in
+// the instance.
 func (w *Webhook) Init() {
 	var url string
 
@@ -35,6 +38,7 @@ func (w *Webhook) Init() {
 	w.URL = url
 }
 
+// HandleEvent sends notifications when release events occur.
 func (w *Webhook) HandleEvent(releaseEvent *kwrelease.Event) {
 	releaseEventForJSON := presenters.ToReleaseEventForJSON(releaseEvent)
 	jsonStr, err := json.Marshal(releaseEventForJSON)
@@ -48,6 +52,7 @@ func (w *Webhook) HandleEvent(releaseEvent *kwrelease.Event) {
 	makeRequest(w, jsonStr)
 }
 
+// HandleServerStartup sends notifications when KubeWise starts up.
 func (w *Webhook) HandleServerStartup(releases []*rspb.Release) {
 	existingReleases := presenters.ToExistingReleasesForJSON(releases)
 	jsonStr, err := json.Marshal(existingReleases)

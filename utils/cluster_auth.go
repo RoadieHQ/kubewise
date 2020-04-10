@@ -16,8 +16,8 @@ limitations under the License.
 
 /*
 Modifications made
- 1. Deleted superflous code for getting object MetaData.
- 2. Added GetClient function.
+ 1. Deleted superfluous code for getting object MetaData.
+ 2. Added GetClient function and made others private.
 */
 
 package utils
@@ -35,15 +35,16 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 )
 
+// GetClient will read the kubectl from within or outside a cluster.
 func GetClient() kubernetes.Interface {
 	_, err := rest.InClusterConfig()
 	if err != nil {
-		return GetClientOutOfCluster()
+		return getClientOutOfCluster()
 	}
-	return GetClientInsideCluster()
+	return getClientInsideCluster()
 }
 
-func GetClientInsideCluster() kubernetes.Interface {
+func getClientInsideCluster() kubernetes.Interface {
 	config, err := rest.InClusterConfig()
 	if err != nil {
 		log.Fatalf("Can not get kubernetes config.")
@@ -65,7 +66,7 @@ func buildOutOfClusterConfig() (*rest.Config, error) {
 	return clientcmd.BuildConfigFromFlags("", kubeconfigPath)
 }
 
-func GetClientOutOfCluster() kubernetes.Interface {
+func getClientOutOfCluster() kubernetes.Interface {
 	config, err := buildOutOfClusterConfig()
 	if err != nil {
 		log.Fatalf("Can not get kubernetes config.")

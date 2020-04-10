@@ -9,9 +9,13 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 )
 
-// Some fields are being denormalized here (such as UpdatedAtTimestamp being taken out of
-// Secret MetaData) because it makes more sense for users of the webhooks. The user wants to
-// know what time the event occurred as a first class concept in the Json.
+// ReleaseEventForJSON is a container for a subset of the properties available in a typical
+// Release Event. Release events contain all of the files present in the Helm package which
+// was installed. They can be massive, larger than your typical JSON payload. They can also
+// contain sensitive data. For this reason, we use ReleaseEventForJSON to whitelist properties.
+//
+// Some fields may be denormalized because it makes more sense for users of the webhooks.
+// The user wants to know what time the event occurred as a first class concept in the Json.
 type ReleaseEventForJSON struct {
 	AppName              string       `json:"appName"`
 	AppVersion           string       `json:"appVersion"`
@@ -29,6 +33,8 @@ type ReleaseEventForJSON struct {
 	ReleaseDescription   string       `json:"releaseDescription"`
 }
 
+// ToReleaseEventForJSON takes a release Event and turns it into a ReleaseEventForJSON. It holds
+// knowledge such as when to omit certain empty time fields and where to find the message prefix.
 func ToReleaseEventForJSON(e *kwrelease.Event) *ReleaseEventForJSON {
 	event := ReleaseEventForJSON{
 		AppName:              e.GetAppName(),
@@ -56,15 +62,14 @@ func ToReleaseEventForJSON(e *kwrelease.Event) *ReleaseEventForJSON {
 	return &event
 }
 
-// This struct is used to marshal Helm release objects so they can be sent to an API.
+// ExistingReleasesForJSON is used to marshal Helm release objects so they can be sent to an API.
 //
-// There are two problems wich just directly marshaling Helm release objects.
+// There are two problems which just directly marshaling Helm release objects.
 //   1. They may contain sensitive data which should not leave the cluster.
 //   2. They are huge when marshalled because all the templates are stored within.
 //
 // By implementing a custom struct we effectively whitelist the properties which should be
 // send to any API.
-
 type ExistingReleasesForJSON struct {
 	MessagePrefix string `json:"messagePrefix,omitempty"`
 	// Do not use omitempty on existingReleases. Doing so requires the API to have a null check
@@ -73,6 +78,8 @@ type ExistingReleasesForJSON struct {
 	ExistingReleases []*ExistingReleaseForJSON `json:"existingReleases"`
 }
 
+// ToExistingReleasesForJSON takes a release Event and turns it into a ToExistingReleasesForJSON.
+// It holds knowledge such where to find the message prefix environment variable.
 func ToExistingReleasesForJSON(releases []*rspb.Release) *ExistingReleasesForJSON {
 	container := ExistingReleasesForJSON{}
 
@@ -91,6 +98,8 @@ func ToExistingReleasesForJSON(releases []*rspb.Release) *ExistingReleasesForJSO
 	return &container
 }
 
+// ExistingReleaseForJSON is a single release Event which may be contained in a
+// ExistingReleasesForJSON object.
 type ExistingReleaseForJSON struct {
 	AppName            string `json:"appName"`
 	AppVersion         string `json:"appVersion"`

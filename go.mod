@@ -9,6 +9,8 @@ require (
 	github.com/olekukonko/tablewriter v0.0.2
 	github.com/rubenv/sql-migrate v0.0.0-20200402132117-435005d389bc // indirect
 	github.com/slack-go/slack v0.6.3
+	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
+	golang.org/x/tools v0.0.0-20200410194907-79a7a3126eef // indirect
 	helm.sh/helm/v3 v3.1.1
 	k8s.io/api v0.17.3
 	k8s.io/apimachinery v0.17.3

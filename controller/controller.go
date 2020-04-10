@@ -52,12 +52,17 @@ const maxRetries = 5
 
 var serverStartTime time.Time
 
+// Event is a temporary, serializable reporesentation of a change in a secret or the creation
+// or deletion of a secret. It can be placed on a queue and processed at a later point in
+// the application where the secret is retrieved by a key.
 type Event struct {
 	key        string
 	eventType  string
 	secretType api_v1.SecretType
 }
 
+// Controller accepts notifications from the Kubernetes APIs and makes decisions based on the
+// events that occur.
 type Controller struct {
 	clientset    kubernetes.Interface
 	queue        workqueue.RateLimitingInterface
@@ -65,6 +70,8 @@ type Controller struct {
 	eventHandler handlers.Handler
 }
 
+// Start watches the Kubernetes secrets API. When notified, sends a message through a channel.
+// Start is blocking. It runs until it receives a SIGTERM or SIGINT.
 func Start(eventHandler handlers.Handler) {
 	kubeClient := utils.GetClient()
 	namespace := ""
@@ -91,7 +98,7 @@ func Start(eventHandler handlers.Handler) {
 	stopCh := make(chan struct{})
 	defer close(stopCh)
 
-	go c.Run(stopCh)
+	go c.run(stopCh)
 
 	sigterm := make(chan os.Signal, 1)
 	signal.Notify(sigterm, syscall.SIGTERM)
@@ -144,7 +151,7 @@ func newResourceController(client kubernetes.Interface, eventHandler handlers.Ha
 	}
 }
 
-func (c *Controller) Run(stopCh <-chan struct{}) {
+func (c *Controller) run(stopCh <-chan struct{}) {
 	defer utilruntime.HandleCrash()
 	defer c.queue.ShutDown()
 
@@ -163,16 +170,19 @@ func (c *Controller) Run(stopCh <-chan struct{}) {
 	wait.Until(c.runWorker, time.Second, stopCh)
 }
 
+// HasSynced is needed to satisfy the Controller interface.
 func (c *Controller) HasSynced() bool {
 	return c.informer.HasSynced()
 }
 
+// LastSyncResourceVersion is needed to satisfy the Controller interface.
 func (c *Controller) LastSyncResourceVersion() string {
 	return c.informer.LastSyncResourceVersion()
 }
 
 func (c *Controller) runWorker() {
 	for c.processNextItem() {
+		// infinite loop
 	}
 }
 
