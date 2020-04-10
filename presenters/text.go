@@ -26,6 +26,9 @@ func getChangeInAppVersion(releaseEvent *kwrelease.Event) string {
 	return appVersion
 }
 
+// PrepareMsg prepares a short, markdown-like message which is suitable for sending to chat
+// applications like Slack. Formatting like *text* us used to add emphasis. This is supported by
+// both Slack and Google Chat. Emoji are also used liberally.
 func PrepareMsg(releaseEvent *kwrelease.Event) string {
 	msg := initializeServerStartupMsg()
 
@@ -130,6 +133,10 @@ func initializeServerStartupMsg() string {
 	return msg
 }
 
+// PrepareServerStartupMsg prepares a message which is suitable for sending to a chat application
+// like Slack on server startup. The message will contain information about the Helm charts that
+// are installed in the cluster at the time of install. They will be presented in a monospaced
+// table.
 func PrepareServerStartupMsg(releases []*release.Release) string {
 	msg := initializeServerStartupMsg()
 	numberOfReleases := len(releases)

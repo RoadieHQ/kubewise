@@ -13,10 +13,14 @@ import (
 	"helm.sh/helm/v3/pkg/release"
 )
 
+// GoogleChat represents the ability to send notifications to Google Hangouts Chat.
+// https://chat.google.com
 type GoogleChat struct {
 	WebhookURL string
 }
 
+// Init retrieves configuration properties from environment variables and stores them in the
+// GoogleChat instance.
 func (g *GoogleChat) Init() {
 	var webhookURL string
 	if value, ok := os.LookupEnv("KW_GOOGLECHAT_WEBHOOK_URL"); ok {
@@ -28,12 +32,14 @@ func (g *GoogleChat) Init() {
 	g.WebhookURL = webhookURL
 }
 
+// HandleEvent sends notifications when release events occur.
 func (g *GoogleChat) HandleEvent(releaseEvent *kwrelease.Event) {
 	if msg := presenters.PrepareMsg(releaseEvent); msg != "" {
 		makeRequest(g, msg)
 	}
 }
 
+// HandleServerStartup sends notifications when KubeWise starts up.
 func (g *GoogleChat) HandleServerStartup(releases []*release.Release) {
 	if msg := presenters.PrepareServerStartupMsg(releases); msg != "" {
 		makeRequest(g, msg)

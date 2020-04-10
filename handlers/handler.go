@@ -24,34 +24,13 @@ Modifications made
 package handlers
 
 import (
-	"github.com/larderdev/kubewise/handlers/googlechat"
-	"github.com/larderdev/kubewise/handlers/slack"
 	"github.com/larderdev/kubewise/kwrelease"
 	"helm.sh/helm/v3/pkg/release"
 )
 
+// Handler instances store configuration regarding the sinks which notifications can be sent to.
 type Handler interface {
 	Init()
 	HandleEvent(releaseEvent *kwrelease.Event)
 	HandleServerStartup(releases []*release.Release)
-}
-
-var Map = map[string]interface{}{
-	"default":    &Default{},
-	"slack":      &slack.Slack{},
-	"googlechat": &googlechat.GoogleChat{},
-}
-
-type Default struct {
-}
-
-func (d *Default) Init() {
-}
-
-func (d *Default) HandleEvent(releaseEvent *kwrelease.Event) {
-
-}
-
-func (d *Default) HandleServerStartup(releases []*release.Release) {
-
 }
