@@ -110,16 +110,20 @@ add the following header to the request `"Authorization":"Bearer <api-token>"`.
 It is easy to use KubeWise from outside your Kubernetes cluster. It will pick up your local
 `kubectl` configuration and use it to speak to your cluster.
 
-You will need to compile the go binary from source. For example,
+First, download a binary from the [Releases page](https://github.com/larderdev/kubewise/releases).
+For OS X, you most likely need the `kubewise_0.7.4_Darwin_x86_64.tar.gz` release. Unzip it.
+
+By default, Apple prevents you from running binaries which are downloaded from the internet. To
+circumvent this, run the following against the downloaded binary.
 
 ```
-# Clone and compile the binary
-git clone git@github.com:larderdev/kubewise.git
-cd kubewise
-go build
+xattr -d com.apple.quarantine ~/path/to/kubewise
+```
 
-# Run it against a cluster
-env KW_HANDLER=slack KW_SLACK_CHANNEL="#<channel>" KW_SLACK_TOKEN="<api-token>" kubewise
+You should now be able to run it like this:
+
+```
+env KW_HANDLER=slack KW_SLACK_CHANNEL="#<channel>" KW_SLACK_TOKEN="<api-token>" ~/path/to/kubewise
 ```
 
 # Multiple clusters in the same channel
