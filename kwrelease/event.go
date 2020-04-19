@@ -41,8 +41,6 @@ func (e *Event) Init() error {
 	e.currentRelease = e.GetRelease(e.CurrentReleaseSecret.Name)
 	e.previousRelease = e.getPreviousRelease()
 
-	e.GetConfigDiffYAML()
-
 	return nil
 }
 
