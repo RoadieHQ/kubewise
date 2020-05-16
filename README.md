@@ -34,16 +34,16 @@ than your chosen team chat app obviously).
 ![Slack sample](./assets/slack-sample-935x422.png)
 
 ### Step 1: Create the bot
- 1. Create a [Slack Bot](https://my.slack.com/services/new/bot).
+ 1. Create a [Slack Bot](https://my.slack.com/services/new/bot) using Slack's admin controls.
     - username: `kubewise`
     - name: `KubeWise`
-    - icon: [Use This](https://raw.githubusercontent.com/larderdev/kubewise/master/assets/kubewise-mark-blue-512x512.png)
+    - icon: [Use this PNG file](https://raw.githubusercontent.com/larderdev/kubewise/master/assets/kubewise-mark-blue-512x512.png)
  2. Save it and grab the API token.
  3. Invite the Bot into your channel by typing `/invite @kubewise` in your Slack channel.
  4. Install KubeWise in your Kubernetes cluster. See below.
 
 ### Step 2: Install KubeWise
-```
+```shell
 kubectl create namespace kubewise
 helm repo add larder https://charts.larder.dev
 helm install kubewise larder/kubewise --namespace kubewise --set handler=slack --set slack.token="<api-token>" --set slack.channel="#<channel>"
@@ -67,7 +67,7 @@ That's it! From now on, Helm operations will result in a message in your chosen 
  8. Click outside the dialog box to close.
 
 ### Step 2: Install KubeWise
-```
+```shell
 kubectl create namespace kubewise
 helm repo add larder https://charts.larder.dev
 helm install kubewise larder/kubewise --namespace kubewise --set handler=googlechat --set googlechat.webhookUrl="<webhook-url>"
@@ -94,7 +94,7 @@ occurs.
 
 ### Step 1: Install KubeWise
 
-```
+```shell
 kubectl create namespace kubewise
 helm repo add larder https://charts.larder.dev
 helm install kubewise larder/kubewise --namespace kubewise --set handler=webhook --set webhook.url="<webhook-url>"
@@ -116,13 +116,13 @@ For OS X, you most likely need the `kubewise_0.7.4_Darwin_x86_64.tar.gz` release
 By default, Apple prevents you from running binaries which are downloaded from the internet. To
 circumvent this, run the following against the downloaded binary.
 
-```
+```shell
 xattr -d com.apple.quarantine ~/path/to/kubewise
 ```
 
 You should now be able to run it like this:
 
-```
+```shell
 env KW_HANDLER=slack KW_SLACK_CHANNEL="#<channel>" KW_SLACK_TOKEN="<api-token>" ~/path/to/kubewise
 ```
 
@@ -133,7 +133,7 @@ It's common for teams to have multiple Kubernetes clusters running such as `stag
 KubeWise supports sending the notifications from all of your clusters to one place.
 In order to tell the clusters apart, it is a good idea to use the `messagePrefix` feature.
 
-```
+```shell
 helm install kubewise larder/kubewise --namespace kubewise --set messagePrefix="\`production\` " --set handler=slack --set slack.token="<api-token>" --set slack.channel="#<channel>"
 ```
 
