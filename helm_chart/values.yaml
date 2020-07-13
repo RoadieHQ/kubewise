@@ -39,6 +39,15 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: kubewise
 
+rbac:
+  # Specifies whether RBAC resources should be created
+  create: true
+
+# If create is `false` Kubewise will be restricted to the namespace
+# where it is deployed, and no ClusterRole or ClusterRoleBinding will be created.
+clusterRole:
+  create: true
+
 podSecurityContext: {}
   # fsGroup: 2000
 
