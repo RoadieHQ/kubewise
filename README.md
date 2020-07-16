@@ -141,6 +141,23 @@ This will produce the following effect:
 
 ![uninstalling ZooKeeper with a message prefix](./assets/message-prefix-sample-567x46.png)
 
+# Different namespaces in different channels
+
+If you run your cluster with test and staging in different namespaces of the same cluster,
+you may wish to send KubeWise notifications to different places for each namespace.
+
+The best way to accomplish this is with multiple instances of KubeWise, each locked down to
+a single namespace. KubeWise is small and uses few resources.
+
+To accomplish this configuration with Helm, set `clusterRole.create=false`,
+`namespaceToWatch="production"` and set (for example) `slack.channel="#production-cluster"`.
+
+Make sure you install KubeWise into the `namespaceToWatch` by passing the `--namespace` flag
+to Helm.
+
+Repeat this process for as many namespaces as you wish, installing KubeWise in each one
+individually.
+
 # Full configuration list
 
 | Parameter | Environment Variable Equivalent | Default | Description |
