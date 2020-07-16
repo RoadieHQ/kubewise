@@ -5,7 +5,7 @@ set -e
 # brew install goreleaser
 # brew install helm
 
-PATH_TO_HELM_REPO=~/dev/larder/helm-repo
+PATH_TO_HELM_REPO=~/dev/roadie/helm-repo
 
 usage() {
   echo "Usage: ./bin/release.sh {major|minor|patch}"
