@@ -33,6 +33,7 @@ git tag -a "$BUMPED_CHART_VERSION" -m "ChartVersion $BUMPED_CHART_VERSION"
 git push
 git push origin $BUMPED_CHART_VERSION
 
+# TODO: No need to do this unless the app was changed (?)
 goreleaser --rm-dist
 
 helm package ./helm_chart

@@ -15,11 +15,11 @@ type: application
 version: 0.11.2
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application.
-appVersion: 0.8.1
+appVersion: 0.11.2
 sources:
-  - https://github.com/larderdev/kubewise
+  - https://github.com/RoadieHQ/kubewise
 maintainers:
   - name: davidtuite
-    email: david@larder.dev
-    url: https://www.larder.dev/kubewise
-icon: https://github.com/larderdev/kubewise/blob/master/assets/kubewise-mark-blue-512x512.png
+    email: david@roadie.io
+    url: https://github.com/RoadieHQ/kubewise
+icon: https://github.com/RoadieHQ/kubewise/blob/master/assets/kubewise-mark-blue-512x512.png
