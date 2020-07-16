@@ -1,4 +1,4 @@
-module github.com/larderdev/kubewise
+module github.com/RoadieHQ/kubewise
 
 go 1.14
 

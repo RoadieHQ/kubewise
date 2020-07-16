@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/larderdev/kubewise/kwrelease"
+	"github.com/RoadieHQ/kubewise/kwrelease"
 	"github.com/olekukonko/tablewriter"
 	"helm.sh/helm/v3/pkg/release"
 )

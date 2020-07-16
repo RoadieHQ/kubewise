@@ -24,7 +24,7 @@ Modifications made
 package handlers
 
 import (
-	"github.com/larderdev/kubewise/kwrelease"
+	"github.com/RoadieHQ/kubewise/kwrelease"
 	"helm.sh/helm/v3/pkg/release"
 )
 

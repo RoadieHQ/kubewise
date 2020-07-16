@@ -5,8 +5,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/larderdev/kubewise/kwrelease"
-	"github.com/larderdev/kubewise/presenters"
+	"github.com/RoadieHQ/kubewise/kwrelease"
+	"github.com/RoadieHQ/kubewise/presenters"
 	"github.com/slack-go/slack"
 	"helm.sh/helm/v3/pkg/release"
 )

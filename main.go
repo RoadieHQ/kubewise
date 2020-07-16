@@ -4,12 +4,12 @@ import (
 	"log"
 	"os"
 
-	"github.com/larderdev/kubewise/controller"
-	"github.com/larderdev/kubewise/handlers"
-	"github.com/larderdev/kubewise/handlers/googlechat"
-	"github.com/larderdev/kubewise/handlers/slack"
-	"github.com/larderdev/kubewise/handlers/webhook"
-	"github.com/larderdev/kubewise/kwrelease"
+	"github.com/RoadieHQ/kubewise/controller"
+	"github.com/RoadieHQ/kubewise/handlers"
+	"github.com/RoadieHQ/kubewise/handlers/googlechat"
+	"github.com/RoadieHQ/kubewise/handlers/slack"
+	"github.com/RoadieHQ/kubewise/handlers/webhook"
+	"github.com/RoadieHQ/kubewise/kwrelease"
 )
 
 func main() {
