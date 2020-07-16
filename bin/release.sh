@@ -20,6 +20,7 @@ fi
 BUMP_MODE="$1"
 
 ./bin/bump_chart.sh $BUMP_MODE
+./bin/bump_app.sh $BUMP_MODE
 BUMPED_CHART_VERSION=$(yq r helm_chart/Chart.yaml version)
 BUMPED_APP_VERSION=$(yq r helm_chart/Chart.yaml appVersion)
 
@@ -33,7 +34,6 @@ git tag -a "$BUMPED_CHART_VERSION" -m "ChartVersion $BUMPED_CHART_VERSION"
 git push
 git push origin $BUMPED_CHART_VERSION
 
-# TODO: No need to do this unless the app was changed (?)
 goreleaser --rm-dist
 
 helm package ./helm_chart
