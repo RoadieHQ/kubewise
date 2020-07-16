@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/larderdev/kubewise/utils"
+	"github.com/RoadieHQ/kubewise/utils"
 	rspb "helm.sh/helm/v3/pkg/release"
 	helmdriver "helm.sh/helm/v3/pkg/storage/driver"
 )

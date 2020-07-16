@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/larderdev/kubewise/kwrelease"
-	"github.com/larderdev/kubewise/presenters"
+	"github.com/RoadieHQ/kubewise/kwrelease"
+	"github.com/RoadieHQ/kubewise/presenters"
 	rspb "helm.sh/helm/v3/pkg/release"
 )
 

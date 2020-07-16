@@ -33,9 +33,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/larderdev/kubewise/handlers"
-	"github.com/larderdev/kubewise/kwrelease"
-	"github.com/larderdev/kubewise/utils"
+	"github.com/RoadieHQ/kubewise/handlers"
+	"github.com/RoadieHQ/kubewise/kwrelease"
+	"github.com/RoadieHQ/kubewise/utils"
 
 	api_v1 "k8s.io/api/core/v1"
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
