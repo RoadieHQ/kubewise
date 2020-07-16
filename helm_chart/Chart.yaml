@@ -1,7 +1,6 @@
 apiVersion: v2
 name: kubewise
 description: Get Helm notifications in your team chat
-
 # A chart can be either an 'application' or a 'library' chart.
 #
 # Application charts are a collection of templates that can be packaged into versioned archives
@@ -11,21 +10,16 @@ description: Get Helm notifications in your team chat
 # a dependency of application charts to inject those utilities and functions into the rendering
 # pipeline. Library charts do not define any templates and therefore cannot be deployed.
 type: application
-
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
-version: 0.11.1
-
+version: 0.11.2
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application.
 appVersion: 0.8.1
-
 sources:
-- https://github.com/larderdev/kubewise
-
+  - https://github.com/larderdev/kubewise
 maintainers:
   - name: davidtuite
     email: david@larder.dev
     url: https://www.larder.dev/kubewise
-
 icon: https://github.com/larderdev/kubewise/blob/master/assets/kubewise-mark-blue-512x512.png
