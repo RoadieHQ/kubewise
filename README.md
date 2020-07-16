@@ -162,5 +162,7 @@ This will produce the following effect:
 | `imagePullSecrets` | | `[]` | Image pull secrets |
 | `nameOverride` | | `""` | Name override |
 | `fullnameOverride` | | `""` | Full name override |
+| `rbac.create` | | `true` | Set to false if you would prefer to bring your own RBAC settings. |
+| `clusterRole.create` | | `true` | Set to false to use non-cluster role bindings. Can be used in conjunction with `namespaceToWatch` to ensure that KubeWise only reports on changes in a single namespace. |
 
 
