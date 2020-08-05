@@ -5,7 +5,7 @@ set -e
 # brew install goreleaser
 # brew install helm
 
-PATH_TO_HELM_REPO=~/dev/roadie/helm-repo
+PATH_TO_HELM_REPO=~/dev/roadie/RoadieHQ/helm-charts/kubewise
 
 usage() {
   echo "Usage: ./bin/release.sh {major|minor|patch}"
@@ -37,3 +37,10 @@ goreleaser --rm-dist
 
 helm package ./helm_chart
 mv kubewise-*.tgz $PATH_TO_HELM_REPO
+
+# To publish the newly created Helm chart
+# cd $PATH_TO_HELM_REPO
+# helm repo index .
+# git add --all
+# git commit -m "Release <CHART_NAME> version <VERSION>"
+# git push

@@ -17,7 +17,7 @@ archives:
 dockers:
   -
     image_templates:
-    - "us.gcr.io/larder-prod/kubewise:{{ .Tag }}"
+    - "roadiehq/kubewise:{{ .Tag }}"
 checksum:
   name_template: 'checksums.txt'
 snapshot:

@@ -1,6 +1,6 @@
 ![KubeWise Mark and Name](./assets/kubewise-name-and-mark-487x127.png)
 
-![Go workflow status](https://github.com/larderdev/kubewise/workflows/Go/badge.svg)
+![Go workflow status](https://github.com/RoadieHQ/kubewise/workflows/Go/badge.svg)
 
 KubeWise is a notifications bot for Helm 3. It notifies your team chat whenever a Helm chart is installed,
 upgraded, rolled back or uninstalled in your Kubernetes cluster.
@@ -37,7 +37,7 @@ than your chosen team chat app obviously).
  1. Create a [Slack Bot](https://my.slack.com/services/new/bot) using Slack's admin controls.
     - username: `kubewise`
     - name: `KubeWise`
-    - icon: [Use this PNG file](https://raw.githubusercontent.com/larderdev/kubewise/master/assets/kubewise-mark-blue-512x512.png)
+    - icon: [Use this PNG file](https://raw.githubusercontent.com/RoadieHQ/kubewise/master/assets/kubewise-mark-blue-512x512.png)
  2. Save it and grab the API token.
  3. Invite the Bot into your channel by typing `/invite @kubewise` in your Slack channel.
  4. Install KubeWise in your Kubernetes cluster. See below.
@@ -45,8 +45,8 @@ than your chosen team chat app obviously).
 ### Step 2: Install KubeWise
 ```shell
 kubectl create namespace kubewise
-helm repo add larder https://charts.larder.dev
-helm install kubewise larder/kubewise --namespace kubewise --set handler=slack --set slack.token="<api-token>" --set slack.channel="#<channel>"
+helm repo add roadie https://charts.roadie.io
+helm install kubewise roadie/kubewise --namespace kubewise --set handler=slack --set slack.token="<api-token>" --set slack.channel="#<channel>"
 ```
 
 That's it! From now on, Helm operations will result in a message in your chosen Slack channel.
@@ -61,7 +61,7 @@ That's it! From now on, Helm operations will result in a message in your chosen 
  2. Go to the room to which you want to add a bot.
  3. From the dropdown menu at the top of the page, select "Configure webhooks".
  4. Under Incoming Webhooks, click ADD WEBHOOK.
- 5. Name the new webhook `KubeWise` and set the Avatar URL to `https://raw.githubusercontent.com/larderdev/kubewise/master/assets/kubewise-mark-blue-512x512.png`.
+ 5. Name the new webhook `KubeWise` and set the Avatar URL to `https://raw.githubusercontent.com/RoadieHQ/kubewise/master/assets/kubewise-mark-blue-512x512.png`.
  6. Click SAVE.
  7. Copy the URL listed next to your new webhook in the Webhook Url column. You will need this later.
  8. Click outside the dialog box to close.
@@ -69,8 +69,8 @@ That's it! From now on, Helm operations will result in a message in your chosen 
 ### Step 2: Install KubeWise
 ```shell
 kubectl create namespace kubewise
-helm repo add larder https://charts.larder.dev
-helm install kubewise larder/kubewise --namespace kubewise --set handler=googlechat --set googlechat.webhookUrl="<webhook-url>"
+helm repo add roadie https://charts.roadie.io
+helm install kubewise roadie/kubewise --namespace kubewise --set handler=googlechat --set googlechat.webhookUrl="<webhook-url>"
 ```
 
 ## Webhooks
@@ -96,8 +96,8 @@ occurs.
 
 ```shell
 kubectl create namespace kubewise
-helm repo add larder https://charts.larder.dev
-helm install kubewise larder/kubewise --namespace kubewise --set handler=webhook --set webhook.url="<webhook-url>"
+helm repo add roadie https://charts.roadie.io
+helm install kubewise roadie/kubewise --namespace kubewise --set handler=webhook --set webhook.url="<webhook-url>"
 ```
 
 The optional parameter `webhook.method` is also supported. It defaults to `POST`.
@@ -110,7 +110,7 @@ add the following header to the request `"Authorization":"Bearer <api-token>"`.
 It is easy to use KubeWise from outside your Kubernetes cluster. It will pick up your local
 `kubectl` configuration and use it to speak to your cluster.
 
-First, download a binary from the [Releases page](https://github.com/larderdev/kubewise/releases).
+First, download a binary from the [Releases page](https://github.com/RoadieHQ/kubewise/releases).
 For OS X, you most likely need the `kubewise_0.7.4_Darwin_x86_64.tar.gz` release. Unzip it.
 
 By default, Apple prevents you from running binaries which are downloaded from the internet. To
@@ -134,7 +134,7 @@ KubeWise supports sending the notifications from all of your clusters to one pla
 In order to tell the clusters apart, it is a good idea to use the `messagePrefix` feature.
 
 ```shell
-helm install kubewise larder/kubewise --namespace kubewise --set messagePrefix="\`production\` " --set handler=slack --set slack.token="<api-token>" --set slack.channel="#<channel>"
+helm install kubewise roadie/kubewise --namespace kubewise --set messagePrefix="\`production\` " --set handler=slack --set slack.token="<api-token>" --set slack.channel="#<channel>"
 ```
 
 This will produce the following effect:
@@ -172,7 +172,7 @@ individually.
 | `namespaceToWatch` | `KW_NAMESPACE` | `""` | The cluster namespace to watch for Helm operations in. Leave blank to watch all namespaces. |
 | `messagePrefix` | `KW_MESSAGE_PREFIX` |  | A prefix for every notification sent. Often used to identify the cluster (production, staging etc). |
 | `chartValuesDiff.enabled` | `KW_CHART_VALUES_DIFF_ENABLED` | `false` | When `true`, KubeWise will log a diff of the chart values when a package is upgraded or rolled back. This is useful for visualizing changes between package versions. Be extremely careful with this feature as it can leak sensitive chart values. |
-| `image.repository` | | `us.gcr.io/larder-prod/kubewise` | Image repository |
+| `image.repository` | | `roadiehq/kubewise` | Image repository |
 | `image.tag` | | `<VERSION>` | Image tag |
 | `replicaCount` | | `1` | Number of KubeWise pods to deploy. More than 1 is not desirable |
 | `image.pullPolicy` | | `IfNotPresent` | Image pull policy |
