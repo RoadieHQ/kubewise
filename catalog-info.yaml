@@ -3,7 +3,11 @@ kind: Component
 metadata:
   name: kubewise
   description: Helm notifications for your team chat.
+  annotations:
+    github.com/project-slug: roadiehq/kubewise
+  tags:
+    - oss
 spec:
   type: service
   lifecycle: production
-  owner: david@roadie.io
+  owner: user:dtuite
